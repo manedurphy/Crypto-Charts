@@ -1,0 +1,34 @@
+version: "3.8"
+services:
+
+  client-dev:
+    build: 
+      context: ./js
+      dockerfile: Dockerfile
+    ports:
+    - "3000:3000"
+    volumes:
+    - ./js/src:/app/src
+
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    environment:
+    - server-url=server:8080
+    ports:
+    - "8081:8081"
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    environment:
+    - redis-url=redis:6379
+    volumes:
+    - ./server/redis:/mnt/secrets-store/redis
+
+  redis:
+    build:
+      context: ./redis
+      dockerfile: Dockerfile

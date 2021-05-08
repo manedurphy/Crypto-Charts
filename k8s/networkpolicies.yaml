@@ -1,0 +1,110 @@
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: server-network-policy
+#   namespace: default
+# spec:
+#   podSelector:
+#     matchLabels:
+#       app: server
+#   policyTypes:
+#   - Ingress
+#   - Egress
+#   ingress:
+#   - from:
+#     - namespaceSelector:
+#         matchLabels:
+#           app: btc
+#       podSelector:
+#         matchLabels:
+#           app: gateway
+#     ports:
+#     - protocol: TCP
+#       port: 8080
+#   egress:
+#   - to:
+#     - namespaceSelector:
+#         matchLabels:
+#           app: btc
+#       podSelector:
+#         matchLabels:
+#           app: redis
+#     ports:
+#     - protocol: TCP
+#       port: 6379
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: js-network-policy
+#   namespace: default
+# spec:
+#   podSelector:
+#     matchLabels:
+#       app: js
+#   policyTypes:
+#   - Egress
+#   egress:
+#   - to:
+#     - namespaceSelector:
+#         matchLabels:
+#           app: btc
+#       podSelector:
+#         matchLabels:
+#           app: gateway
+#     ports:
+#     - protocol: TCP
+#       port: 8081
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: gateway-network-policy
+#   namespace: default
+# spec:
+#   podSelector:
+#     matchLabels:
+#       app: gateway
+#   policyTypes:
+#   - Ingress
+#   - Egress
+#   ingress:
+#   - from:
+#     - namespaceSelector:
+#         matchLabels:
+#           app: btc
+#       podSelector:
+#         matchLabels:
+#           app: js
+#   egress:
+#   - to:
+#     - namespaceSelector:
+#         matchLabels:
+#           app: btc
+#       podSelector:
+#         matchLabels:
+#           app: server
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: NetworkPolicy
+# metadata:
+#   name: redis-network-policy
+#   namespace: default
+# spec:
+#   podSelector:
+#     matchLabels:
+#       app: redis
+#   policyTypes:
+#   - Ingress
+#   ingress:
+#   - from:
+#     - namespaceSelector:
+#         matchLabels:
+#           app: btc
+#       podSelector:
+#         matchLabels:
+#           app: server
+    
+#     ports:
+#     - protocol: TCP
+#       port: 6379

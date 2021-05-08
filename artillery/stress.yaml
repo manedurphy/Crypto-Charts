@@ -1,0 +1,10 @@
+config:
+  # target: "http://localhost:3000"
+  target: "http://104.200.26.111"
+  phases:
+  - duration: 45
+    arrivalRate: 750
+scenarios:
+  - flow:
+    - get:
+        url: "/api/btc"

@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+ name: server-standlone-container
+spec:
+ containers:
+ -  name: server-standlone-container
+    image: k8s/server:latest
+    imagePullPolicy: Never
+    env:
+    - name: redis-url
+      valueFrom:
+        configMapKeyRef:
+          name: urls
+          key: redis
+    volumeMounts:
+    - name: secrets-store-inline
+      mountPath: "/mnt/secrets-store"
+      readOnly: true
+ serviceAccountName: redis-sa
+ volumes:
+   - name: secrets-store-inline
+     csi:
+       driver: secrets-store.csi.k8s.io
+       readOnly: true
+       volumeAttributes:
+         secretProviderClass: "redis-spc"

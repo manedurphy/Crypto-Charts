@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: redis-sa
+---
+apiVersion: secrets-store.csi.x-k8s.io/v1alpha1
+kind: SecretProviderClass
+metadata:
+  name: redis-spc
+spec:
+  provider: vault
+  parameters:
+    roleName: "redis-role"
+    vaultSkipTLSVerify: "true"
+    vaultAddress: http://vault.vault:8200
+    objects:  |
+      - objectName: "redis"
+        secretPath: "secret/data/redis"
+        secretKey: "redis-password"

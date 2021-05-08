@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: urls
+data:
+  redis: redis:6379
+  server: server:8080
