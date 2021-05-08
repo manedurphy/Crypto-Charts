@@ -43,11 +43,11 @@ teardown:
 	docker-compose down && docker image prune -a
 
 gateway-image:
-	go build -o gateway/gateway gateway/gateway.go
+	go build -o gateway/_output/gateway gateway/gateway.go
 	docker build -t k8s/gateway:latest -f gateway/Dockerfile.prod gateway/
 
 server-image:
-	go build -o server/server server/server.go
+	go build -o server/_output/server server/server.go
 	docker build -t k8s/server:latest -f server/Dockerfile server/
 
 js-image:
@@ -108,7 +108,7 @@ vault-auth:
 	kubectl exec --namespace=vault vault-0 -- vault auth enable kubernetes
 	kubectl exec --namespace=vault vault-0 -- sh -c 'vault write auth/kubernetes/config \
 		token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
-		kubernetes_host="https://$KUBERNETES_PORT_443_TCP_ADDR:443" \
+		kubernetes_host="https://$(kubectl exec --namespace=vault vault-0 -- env | awk -F"=" '/KUBERNETES_PORT_443_TCP_ADDR/ { print $2}'):443" \
 		kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
 		issuer="https://kubernetes.default.svc.cluster.local"'
 
