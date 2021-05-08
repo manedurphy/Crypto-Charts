@@ -43,34 +43,33 @@ teardown:
 	docker-compose down && docker image prune -a
 
 gateway-image:
-	go build -o gateway/gateway gateway/gateway.go && \
+	go build -o gateway/gateway gateway/gateway.go
 	docker build -t k8s/gateway:latest -f gateway/Dockerfile.prod gateway/
 
 server-image:
-	go build -o server/server server/server.go && \
+	go build -o server/server server/server.go
 	docker build -t k8s/server:latest -f server/Dockerfile server/
 
 js-image:
-	cd js && yarn run build && \
-	docker build -t k8s/js:latest -f Dockerfile.prod .
+	cd js && yarn run build
+	docker build -t k8s/js:latest -f js/Dockerfile.prod js/
 
 redis-image:
-	cd redis && \
-	docker build -t k8s/redis:latest .
+	docker build -t k8s/redis:latest -f redis/Dockerfile redis/
 
 load: gateway-image server-image js-image redis-image
-	kind load docker-image k8s/gateway:latest && \
-	kind load docker-image k8s/server:latest && \
-	kind load docker-image k8s/js:latest && \
+	kind load docker-image k8s/gateway:latest
+	kind load docker-image k8s/server:latest
+	kind load docker-image k8s/js:latest
 	kind load docker-image k8s/redis:latest
 
 deploy:
-	# kubectl apply -f k8s/spc.yaml
+	kubectl apply -f k8s/spc.yaml
 	kubectl apply -f k8s/configmaps.yaml
 	kubectl apply -f k8s/services.yaml
 	kubectl apply -f k8s/deployments.yaml
 	kubectl apply -f k8s/hpas.yaml
-	kubectl apply -f k8s/networkpolicies.yaml
+	# kubectl apply -f k8s/networkpolicies.yaml
 
 destroy:
 	# kubectl delete -f k8s/spc.yaml
@@ -78,7 +77,7 @@ destroy:
 	kubectl delete -f k8s/services.yaml
 	kubectl delete -f k8s/deployments.yaml
 	kubectl delete -f k8s/hpas.yaml
-	kubectl delete -f k8s/networkpolicies.yaml
+	# kubectl delete -f k8s/networkpolicies.yaml
 
 forward:
 	kubectl port-forward service/js 3000:80
@@ -98,8 +97,8 @@ vault-deploy:
 		--set "server.dev.enabled=true" \
 		--set "injector.enabled=false" \
 		--set "csi.enabled=true"
-	kubectl wait --namespace=vault --for=condition=Ready --timeout=30s pod/vault-0
-	kubectl wait --namespace=vault --for=condition=Ready --timeout=30s pod -l app.kubernetes.io/name=vault-csi-provider
+	kubectl wait --namespace=vault --for=condition=Ready --timeout=5m pod/vault-0
+	kubectl wait --namespace=vault --for=condition=Ready --timeout=5m pod -l app.kubernetes.io/name=vault-csi-provider
 
 vault-secret:
 	kubectl exec --namespace=vault vault-0 -- vault kv put secret/redis redis-password="password"
@@ -127,6 +126,7 @@ vault: vault-deploy vault-secret vault-auth vault-policy vault-role
 
 csi-driver:
 	helm install csi --namespace=vault secrets-store-csi-driver/secrets-store-csi-driver
+	kubectl wait --namespace=vault --for=condition=Ready --timeout=5m pod -l app.kubernetes.io/name=secrets-store-csi-driver
 
 secrets-store: vault csi-driver
 
