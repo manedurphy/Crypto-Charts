@@ -15,6 +15,14 @@ cluster:
 weave: 
 	kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 
+ingress-controller:
+	kubectl create namespace ingress-nginx
+	helm install --namespace=ingress-nginx ingress-nginx ingress-nginx/ingress-nginx
+
+ingress-destroy:
+	helm uninstall --namespace=ingress-nginx ingress-nginx
+	kubectl delete namespace ingress-nginx
+
 docker-build:
 	docker build -f gateway/Dockerfile.prod -t gateway gateway
 	docker build -f server/Dockerfile -t server server
@@ -64,10 +72,11 @@ load: gateway-image server-image js-image redis-image
 	kind load docker-image k8s/redis:latest
 
 deploy:
-	kubectl apply -f k8s/spc.yaml
+	# kubectl apply -f k8s/spc.yaml
 	kubectl apply -f k8s/configmaps.yaml
 	kubectl apply -f k8s/services.yaml
 	kubectl apply -f k8s/deployments.yaml
+	kubectl apply -f k8s/ingress.yaml
 	kubectl apply -f k8s/hpas.yaml
 	# kubectl apply -f k8s/networkpolicies.yaml
 
@@ -76,11 +85,13 @@ destroy:
 	kubectl delete -f k8s/configmaps.yaml
 	kubectl delete -f k8s/services.yaml
 	kubectl delete -f k8s/deployments.yaml
+	kubectl delete -f k8s/ingress.yaml
 	kubectl delete -f k8s/hpas.yaml
 	# kubectl delete -f k8s/networkpolicies.yaml
 
 forward:
-	kubectl port-forward service/js 3000:80
+	kubectl config set-context --current --namespace=ingress-nginx
+	kubectl port-forward service/ingress-nginx-controller 3000:80
 
 metrics:
 	kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
@@ -108,7 +119,7 @@ vault-auth:
 	kubectl exec --namespace=vault vault-0 -- vault auth enable kubernetes
 	kubectl exec --namespace=vault vault-0 -- sh -c 'vault write auth/kubernetes/config \
 		token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
-		kubernetes_host="https://$(kubectl exec --namespace=vault vault-0 -- env | awk -F"=" '/KUBERNETES_PORT_443_TCP_ADDR/ { print $2}'):443" \
+		kubernetes_host="https://10.128.0.1:443" \
 		kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
 		issuer="https://kubernetes.default.svc.cluster.local"'
 

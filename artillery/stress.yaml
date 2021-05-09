@@ -1,6 +1,6 @@
 config:
   # target: "http://localhost:3000"
-  target: "http://104.200.26.111"
+  target: "https://btc.charts.com"
   phases:
   - duration: 45
     arrivalRate: 750

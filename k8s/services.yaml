@@ -3,8 +3,7 @@ kind: Service
 metadata:
   name: js
 spec:
-  type: LoadBalancer
-  # type: NodePort
+  type: NodePort
   selector:
     app: js
   ports:
@@ -17,7 +16,7 @@ kind: Service
 metadata:
   name: gateway
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: gateway
   ports:
