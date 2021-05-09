@@ -22,9 +22,8 @@ import (
 var (
 	rdb *redis.Client = redis.NewClient(&redis.Options{
 		Addr:     os.Getenv("redis-url"),
-		Password: os.Getenv("redis-password"),
-		// Password: getPassword(),
-		DB: 0,
+		Password: getPassword(),
+		DB:       0,
 	})
 )
 

@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: server-deployment
+  namespace: btc-charts
 spec:
   replicas: 3
   selector:
@@ -12,7 +13,7 @@ spec:
       labels:
         app: server
     spec:
-      # serviceAccountName: redis-sa
+      serviceAccountName: redis-sa
       containers:
       - name: server-container
         image: manedurphy/grpc-server
@@ -31,27 +32,23 @@ spec:
             configMapKeyRef:
               name: urls
               key: redis
-        - name: redis-password
-          valueFrom:
-            secretKeyRef:
-              name: redis-credentials
-              key: redis-password
-      #   volumeMounts:
-      #   - name: vault-creds
-      #     readOnly: true
-      #     mountPath: /mnt/secrets-store
-      # volumes:
-      # - name: vault-creds
-      #   csi:
-      #     driver: secrets-store.csi.k8s.io
-      #     readOnly: true
-      #     volumeAttributes:
-      #       secretProviderClass: "redis-spc"
+        volumeMounts:
+        - name: vault-creds
+          readOnly: true
+          mountPath: /mnt/secrets-store
+      volumes:
+      - name: vault-creds
+        csi:
+          driver: secrets-store.csi.k8s.io
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "redis-spc"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: js-deployment
+  namespace: btc-charts
   labels:
     app: js
 
@@ -75,6 +72,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gateway-deployment
+  namespace: btc-charts
 
 spec:
   replicas: 1
@@ -129,6 +127,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redis-deployment
+  namespace: btc-charts
 
 spec:
   replicas: 1

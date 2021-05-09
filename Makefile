@@ -12,6 +12,10 @@ build:
 cluster:
 	kind create cluster --config kind.yaml
 
+cli:
+	cd kubeconfig && docker build -t linode .
+	docker run --rm -it -v $(shell pwd):/work -w /work --entrypoint /bin/bash linode
+
 weave: 
 	kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 
@@ -72,7 +76,8 @@ load: gateway-image server-image js-image redis-image
 	kind load docker-image k8s/redis:latest
 
 deploy:
-	# kubectl apply -f k8s/spc.yaml
+	kubectl create namespace btc-charts
+	kubectl apply -f k8s/spc.yaml
 	kubectl apply -f k8s/configmaps.yaml
 	kubectl apply -f k8s/services.yaml
 	kubectl apply -f k8s/deployments.yaml
@@ -81,13 +86,14 @@ deploy:
 	# kubectl apply -f k8s/networkpolicies.yaml
 
 destroy:
-	# kubectl delete -f k8s/spc.yaml
+	kubectl delete -f k8s/spc.yaml
 	kubectl delete -f k8s/configmaps.yaml
 	kubectl delete -f k8s/services.yaml
 	kubectl delete -f k8s/deployments.yaml
 	kubectl delete -f k8s/ingress.yaml
 	kubectl delete -f k8s/hpas.yaml
 	# kubectl delete -f k8s/networkpolicies.yaml
+	kubectl delete namespace btc-charts
 
 forward:
 	kubectl config set-context --current --namespace=ingress-nginx
@@ -119,7 +125,7 @@ vault-auth:
 	kubectl exec --namespace=vault vault-0 -- vault auth enable kubernetes
 	kubectl exec --namespace=vault vault-0 -- sh -c 'vault write auth/kubernetes/config \
 		token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
-		kubernetes_host="https://10.128.0.1:443" \
+		kubernetes_host="https://$$KUBERNETES_PORT_443_TCP_ADDR:443" \
 		kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
 		issuer="https://kubernetes.default.svc.cluster.local"'
 
@@ -129,7 +135,7 @@ vault-policy:
 vault-role:
 	kubectl exec --namespace=vault vault-0 -- vault write auth/kubernetes/role/redis-role \
 		bound_service_account_names=redis-sa \
-		bound_service_account_namespaces=default \
+		bound_service_account_namespaces=btc-charts \
 		policies=redis-policy \
 		ttl=20m	
 
