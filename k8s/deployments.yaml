@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: server-deployment
-  namespace: btc-charts
 spec:
   replicas: 3
   selector:
@@ -27,11 +26,11 @@ spec:
             memory: "75Mi"
             cpu: "175m"
         env:
-        - name: redis-url
+        - name: REDIS_URL
           valueFrom:
             configMapKeyRef:
               name: urls
-              key: redis
+              key: REDIS_URL
         volumeMounts:
         - name: vault-creds
           readOnly: true
@@ -48,7 +47,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: js-deployment
-  namespace: btc-charts
   labels:
     app: js
 
@@ -72,7 +70,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: gateway-deployment
-  namespace: btc-charts
 
 spec:
   replicas: 1
@@ -117,17 +114,16 @@ spec:
           periodSeconds: 3
           failureThreshold: 10
         env:
-        - name: server-url
+        - name: BTC_SERVER
           valueFrom:
             configMapKeyRef:
               name: urls
-              key: server
+              key: BTC_SERVER
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redis-deployment
-  namespace: btc-charts
 
 spec:
   replicas: 1

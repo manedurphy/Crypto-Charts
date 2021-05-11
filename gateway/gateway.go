@@ -12,6 +12,7 @@ import (
 	"github.com/manedurphy/grpc-web/pb"
 	"github.com/rs/cors"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 func main() {
@@ -26,7 +27,9 @@ func run() error {
 	defer cancel()
 
 	mux := runtime.NewServeMux()
-	conn, err := grpc.DialContext(ctx, os.Getenv("server-url"), grpc.WithInsecure()) // Try to use TLS
+
+	creds, _ := credentials.NewClientTLSFromFile("tls/ca.crt", "")
+	conn, err := grpc.DialContext(ctx, os.Getenv("BTC_SERVER"), grpc.WithTransportCredentials(creds))
 
 	if err != nil {
 		log.Fatalf("failed to dial gRPC server: %v", err)

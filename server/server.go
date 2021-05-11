@@ -16,15 +16,18 @@ import (
 	pb "github.com/manedurphy/grpc-web/pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 )
 
 var (
 	rdb *redis.Client = redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("redis-url"),
+		Addr:     os.Getenv("REDIS_URL"),
 		Password: getPassword(),
 		DB:       0,
 	})
+	certfile = "tls/server.crt"
+	keyfile  = "tls/server.key"
 )
 
 type server struct {
@@ -33,6 +36,29 @@ type server struct {
 
 type externalData struct {
 	Bpi map[string]float64
+}
+
+func main() {
+	lis, err := net.Listen("tcp", ":8080")
+
+	if err != nil {
+		log.Fatalf("could not listen on port 8080: %v\n", err)
+	}
+
+	fmt.Println("gRPC server started on on port 8080")
+
+	creds, err := credentials.NewServerTLSFromFile(certfile, keyfile)
+	if err != nil {
+		log.Fatalf("coudld not get certificates for tls: %v", err)
+	}
+
+	s := grpc.NewServer(grpc.Creds(creds))
+
+	pb.RegisterBitcoinServiceServer(s, &server{})
+
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("could not start server: %v\n", err)
+	}
 }
 
 func (*server) GetBitCoinData(ctx context.Context, req *pb.BitcoinRequest) (*pb.BitcoinResponse, error) {
@@ -132,21 +158,4 @@ func getPassword() string {
 
 	secret, _ := ioutil.ReadAll(file)
 	return string(secret)
-}
-
-func main() {
-	lis, err := net.Listen("tcp", ":8080")
-
-	if err != nil {
-		log.Fatalf("could not listen on port 8080: %v\n", err)
-	}
-
-	fmt.Println("gRPC server started on on port 8080")
-
-	s := grpc.NewServer()
-	pb.RegisterBitcoinServiceServer(s, &server{})
-
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("could not start server: %v\n", err)
-	}
 }
