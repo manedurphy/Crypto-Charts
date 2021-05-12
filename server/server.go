@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -29,6 +30,8 @@ var (
 	})
 	certfile = "tls/server.crt"
 	keyfile  = "tls/server.key"
+
+	secure = flag.Bool("secure", true, "set to true to use TLS connection")
 )
 
 type server struct {
@@ -54,9 +57,11 @@ func main() {
 	}
 
 	var s *grpc.Server
-	if true {
+	if !*secure {
+		fmt.Println("Insecure connection established with gateway")
 		s = grpc.NewServer()
 	} else {
+		fmt.Println("TLS connection established with gateway")
 		s = grpc.NewServer(grpc.Creds(creds))
 	}
 

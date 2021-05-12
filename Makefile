@@ -78,7 +78,7 @@ load: gateway-image server-image js-image redis-image
 
 deploy:
 	kubectl create namespace btc-charts
-	# kubectl --namespace=btc-charts apply -f k8s/spc.yaml
+	kubectl --namespace=btc-charts apply -f k8s/spc.yaml
 	kubectl --namespace=btc-charts create secret generic redis-credentials --from-literal redis-password=password
 	kubectl --namespace=btc-charts apply -f k8s/configmaps.yaml
 	kubectl --namespace=btc-charts apply -f k8s/services.yaml
@@ -88,7 +88,7 @@ deploy:
 	# kubectl --namespace=btc-charts apply -f k8s/networkpolicies.yaml
 
 destroy:
-	# kubectl --namespace=btc-charts delete -f k8s/spc.yaml
+	kubectl --namespace=btc-charts delete -f k8s/spc.yaml
 	kubectl --namespace=btc-charts delete -f k8s/configmaps.yaml
 	kubectl --namespace=btc-charts delete -f k8s/services.yaml
 	kubectl --namespace=btc-charts delete -f k8s/deployments.yaml

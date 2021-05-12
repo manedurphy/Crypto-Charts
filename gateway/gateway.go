@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,6 +14,10 @@ import (
 	"github.com/rs/cors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+)
+
+var (
+	secure = flag.Bool("secure", true, "set to true to use TLS connection")
 )
 
 func main() {
@@ -32,9 +37,11 @@ func run() error {
 
 	var conn *grpc.ClientConn
 	var err error
-	if true {
+	if !*secure {
+		fmt.Println("Insecure connection established with server")
 		conn, err = grpc.DialContext(ctx, os.Getenv("BTC_SERVER"), grpc.WithInsecure())
 	} else {
+		fmt.Println("TLS connection established with server")
 		conn, err = grpc.DialContext(ctx, os.Getenv("BTC_SERVER"), grpc.WithTransportCredentials(creds))
 	}
 
