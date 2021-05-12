@@ -1,9 +1,8 @@
 config:
-  # target: "http://localhost:3000"
-  target: "https://btc.charts.com"
+  target: "http://localhost:8081"
   phases:
   - duration: 45
-    arrivalRate: 750
+    arrivalRate: 1000
 scenarios:
   - flow:
     - get:

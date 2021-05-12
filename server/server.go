@@ -14,6 +14,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	pb "github.com/manedurphy/grpc-web/pb"
+	store "github.com/manedurphy/grpc-web/server/redis"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
@@ -23,7 +24,7 @@ import (
 var (
 	rdb *redis.Client = redis.NewClient(&redis.Options{
 		Addr:     os.Getenv("REDIS_URL"),
-		Password: getPassword(),
+		Password: store.GetPassword(),
 		DB:       0,
 	})
 	certfile = "tls/server.crt"
@@ -52,7 +53,12 @@ func main() {
 		log.Fatalf("coudld not get certificates for tls: %v", err)
 	}
 
-	s := grpc.NewServer(grpc.Creds(creds))
+	var s *grpc.Server
+	if true {
+		s = grpc.NewServer()
+	} else {
+		s = grpc.NewServer(grpc.Creds(creds))
+	}
 
 	pb.RegisterBitcoinServiceServer(s, &server{})
 
@@ -65,7 +71,7 @@ func (*server) GetBitCoinData(ctx context.Context, req *pb.BitcoinRequest) (*pb.
 	redisData, err := rdb.Get(ctx, "data").Result()
 
 	if err != redis.Nil {
-		redisResp, err := handleRedisData([]byte(redisData))
+		redisResp, err := store.HandleRedisData([]byte(redisData))
 
 		if err == nil {
 			return redisResp, nil
@@ -120,42 +126,4 @@ func handleExternalData(body []byte) ([]*pb.BitcoinDatum, error) {
 	}
 
 	return btcResp, nil
-}
-
-func handleRedisData(redisData []byte) (*pb.BitcoinResponse, error) {
-	var data []*pb.BitcoinDatum
-	err := json.Unmarshal(redisData, &data)
-
-	if err != nil {
-		return nil, fmt.Errorf("error unmarshaling data from redis cache: %v", err)
-	}
-
-	resp := []*pb.BitcoinDatum{}
-
-	for _, v := range data {
-		resp = append(resp, &pb.BitcoinDatum{Date: v.Date, Value: v.Value})
-	}
-
-	sort.Slice(resp, func(i int, j int) bool {
-		return resp[i].Date < resp[j].Date
-	})
-
-	fmt.Println("Sending data from redis store!")
-
-	return &pb.BitcoinResponse{Data: data}, nil
-}
-
-func getPassword() string {
-	file, err := os.Open("/mnt/secrets-store/redis")
-
-	if err != nil {
-		return ""
-	}
-
-	defer file.Close()
-
-	fmt.Println("successfully received secret from file system")
-
-	secret, _ := ioutil.ReadAll(file)
-	return string(secret)
 }

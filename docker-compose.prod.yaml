@@ -22,7 +22,7 @@ services:
     environment:
     - REDIS_URL=redis:6379
     volumes:
-    - ./server/redis:/mnt/secrets-store/redis
+    - ./server/redis-creds:/mnt/secrets-store/redis
 
   redis:
     build:

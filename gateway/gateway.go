@@ -23,13 +23,20 @@ func main() {
 
 func run() error {
 	fmt.Println("starting grpc gateway on port 8081")
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
 
 	mux := runtime.NewServeMux()
 
 	creds, _ := credentials.NewClientTLSFromFile("tls/ca.crt", "")
-	conn, err := grpc.DialContext(ctx, os.Getenv("BTC_SERVER"), grpc.WithTransportCredentials(creds))
+
+	var conn *grpc.ClientConn
+	var err error
+	if true {
+		conn, err = grpc.DialContext(ctx, os.Getenv("BTC_SERVER"), grpc.WithInsecure())
+	} else {
+		conn, err = grpc.DialContext(ctx, os.Getenv("BTC_SERVER"), grpc.WithTransportCredentials(creds))
+	}
 
 	if err != nil {
 		log.Fatalf("failed to dial gRPC server: %v", err)
