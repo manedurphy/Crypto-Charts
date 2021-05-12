@@ -34,7 +34,11 @@ var (
 	secure = flag.Bool("secure", true, "set to true to use TLS connection")
 )
 
-type server struct {
+type cryptoServer struct {
+	pb.UnimplementedCryptoServiceServer
+}
+
+type btcServer struct {
 	pb.UnimplementedBitcoinServiceServer
 }
 
@@ -65,14 +69,15 @@ func main() {
 		s = grpc.NewServer(grpc.Creds(creds))
 	}
 
-	pb.RegisterBitcoinServiceServer(s, &server{})
+	pb.RegisterCryptoServiceServer(s, &cryptoServer{})
+	pb.RegisterBitcoinServiceServer(s, &btcServer{})
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("could not start server: %v\n", err)
 	}
 }
 
-func (*server) GetBitCoinData(ctx context.Context, req *pb.BitcoinRequest) (*pb.BitcoinResponse, error) {
+func (*btcServer) GetBitCoinData(ctx context.Context, req *pb.BitcoinRequest) (*pb.BitcoinResponse, error) {
 	redisData, err := rdb.Get(ctx, "data").Result()
 
 	if err != redis.Nil {
@@ -110,6 +115,48 @@ func (*server) GetBitCoinData(ctx context.Context, req *pb.BitcoinRequest) (*pb.
 	}
 
 	return &pb.BitcoinResponse{Data: btcResp}, nil
+}
+
+func (*cryptoServer) GetCryptoData(context.Context, *pb.CryptoRequest) (*pb.CryptoResponse, error) {
+	url := "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,DOGE&tsyms=USD,EUR"
+	request, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	request.Header.Add("Authorization", "Bearer "+os.Getenv("CRYPTO_API_KEY"))
+
+	client := &http.Client{}
+	resp, err := client.Do(request)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	cryptoResp, err := handleCryptoData(body)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return cryptoResp, nil
+}
+
+func handleCryptoData(body []byte) (*pb.CryptoResponse, error) {
+	var cryptoData pb.CryptoResponse
+	err := json.Unmarshal(body, &cryptoData)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &cryptoData, nil
 }
 
 func handleExternalData(body []byte) ([]*pb.BitcoinDatum, error) {

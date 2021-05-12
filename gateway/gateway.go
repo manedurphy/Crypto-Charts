@@ -54,6 +54,12 @@ func run() error {
 		log.Fatalf("could not dial endpoint: %v", err)
 	}
 
+	err = pb.RegisterCryptoServiceHandler(ctx, mux, conn)
+
+	if err != nil {
+		log.Fatalf("could not dial endpoint: %v", err)
+	}
+
 	goEnv := os.Getenv("GO_ENV")
 
 	err = healthHandler(mux)

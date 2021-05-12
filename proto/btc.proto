@@ -25,3 +25,25 @@ service BitcoinService {
 		};
 	};
 }
+
+message CryptoRequest {
+}
+
+message CryptoDatum {
+	double USD = 1;
+	double EUR = 2;
+}
+
+message CryptoResponse {
+	CryptoDatum BTC = 1;
+	CryptoDatum ETH = 2;
+	CryptoDatum DOGE = 3;
+}
+
+service CryptoService {
+	rpc GetCryptoData (CryptoRequest) returns (CryptoResponse) {
+		option (google.api.http) = {
+			get: "/api/crypto"
+		};
+	};
+}

@@ -49,6 +49,24 @@ func local_request_BitcoinService_GetBitCoinData_0(ctx context.Context, marshale
 
 }
 
+func request_CryptoService_GetCryptoData_0(ctx context.Context, marshaler runtime.Marshaler, client CryptoServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq CryptoRequest
+	var metadata runtime.ServerMetadata
+
+	msg, err := client.GetCryptoData(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_CryptoService_GetCryptoData_0(ctx context.Context, marshaler runtime.Marshaler, server CryptoServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq CryptoRequest
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.GetCryptoData(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 // RegisterBitcoinServiceHandlerServer registers the http handlers for service BitcoinService to "mux".
 // UnaryRPC     :call BitcoinServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -75,6 +93,38 @@ func RegisterBitcoinServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		}
 
 		forward_BitcoinService_GetBitCoinData_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	return nil
+}
+
+// RegisterCryptoServiceHandlerServer registers the http handlers for service CryptoService to "mux".
+// UnaryRPC     :call CryptoServiceServer directly.
+// StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterCryptoServiceHandlerFromEndpoint instead.
+func RegisterCryptoServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server CryptoServiceServer) error {
+
+	mux.Handle("GET", pattern_CryptoService_GetCryptoData_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/btc.CryptoService/GetCryptoData")
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_CryptoService_GetCryptoData_0(rctx, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_CryptoService_GetCryptoData_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -148,4 +198,73 @@ var (
 
 var (
 	forward_BitcoinService_GetBitCoinData_0 = runtime.ForwardResponseMessage
+)
+
+// RegisterCryptoServiceHandlerFromEndpoint is same as RegisterCryptoServiceHandler but
+// automatically dials to "endpoint" and closes the connection when "ctx" gets done.
+func RegisterCryptoServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+	conn, err := grpc.Dial(endpoint, opts...)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
+			}
+			return
+		}
+		go func() {
+			<-ctx.Done()
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
+			}
+		}()
+	}()
+
+	return RegisterCryptoServiceHandler(ctx, mux, conn)
+}
+
+// RegisterCryptoServiceHandler registers the http handlers for service CryptoService to "mux".
+// The handlers forward requests to the grpc endpoint over "conn".
+func RegisterCryptoServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterCryptoServiceHandlerClient(ctx, mux, NewCryptoServiceClient(conn))
+}
+
+// RegisterCryptoServiceHandlerClient registers the http handlers for service CryptoService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "CryptoServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "CryptoServiceClient"
+// doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
+// "CryptoServiceClient" to call the correct interceptors.
+func RegisterCryptoServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client CryptoServiceClient) error {
+
+	mux.Handle("GET", pattern_CryptoService_GetCryptoData_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req, "/btc.CryptoService/GetCryptoData")
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_CryptoService_GetCryptoData_0(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_CryptoService_GetCryptoData_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	return nil
+}
+
+var (
+	pattern_CryptoService_GetCryptoData_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api", "crypto"}, ""))
+)
+
+var (
+	forward_CryptoService_GetCryptoData_0 = runtime.ForwardResponseMessage
 )

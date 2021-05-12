@@ -99,3 +99,89 @@ var BitcoinService_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "btc.proto",
 }
+
+// CryptoServiceClient is the client API for CryptoService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type CryptoServiceClient interface {
+	GetCryptoData(ctx context.Context, in *CryptoRequest, opts ...grpc.CallOption) (*CryptoResponse, error)
+}
+
+type cryptoServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewCryptoServiceClient(cc grpc.ClientConnInterface) CryptoServiceClient {
+	return &cryptoServiceClient{cc}
+}
+
+func (c *cryptoServiceClient) GetCryptoData(ctx context.Context, in *CryptoRequest, opts ...grpc.CallOption) (*CryptoResponse, error) {
+	out := new(CryptoResponse)
+	err := c.cc.Invoke(ctx, "/btc.CryptoService/GetCryptoData", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// CryptoServiceServer is the server API for CryptoService service.
+// All implementations must embed UnimplementedCryptoServiceServer
+// for forward compatibility
+type CryptoServiceServer interface {
+	GetCryptoData(context.Context, *CryptoRequest) (*CryptoResponse, error)
+	mustEmbedUnimplementedCryptoServiceServer()
+}
+
+// UnimplementedCryptoServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedCryptoServiceServer struct {
+}
+
+func (UnimplementedCryptoServiceServer) GetCryptoData(context.Context, *CryptoRequest) (*CryptoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCryptoData not implemented")
+}
+func (UnimplementedCryptoServiceServer) mustEmbedUnimplementedCryptoServiceServer() {}
+
+// UnsafeCryptoServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to CryptoServiceServer will
+// result in compilation errors.
+type UnsafeCryptoServiceServer interface {
+	mustEmbedUnimplementedCryptoServiceServer()
+}
+
+func RegisterCryptoServiceServer(s grpc.ServiceRegistrar, srv CryptoServiceServer) {
+	s.RegisterService(&CryptoService_ServiceDesc, srv)
+}
+
+func _CryptoService_GetCryptoData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CryptoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CryptoServiceServer).GetCryptoData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/btc.CryptoService/GetCryptoData",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CryptoServiceServer).GetCryptoData(ctx, req.(*CryptoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// CryptoService_ServiceDesc is the grpc.ServiceDesc for CryptoService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var CryptoService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "btc.CryptoService",
+	HandlerType: (*CryptoServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetCryptoData",
+			Handler:    _CryptoService_GetCryptoData_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "btc.proto",
+}
