@@ -47,3 +47,14 @@ func HandleRedisData(redisData []byte) (*pb.BitcoinResponse, error) {
 
 	return &pb.BitcoinResponse{Data: data}, nil
 }
+
+func GetCryptoData(redisdata []byte) (*pb.CryptoResponse, error) {
+	var cryptoData *pb.CryptoResponse
+	err := json.Unmarshal(redisdata, &cryptoData)
+
+	if err != nil {
+		return nil, fmt.Errorf("error unmarshaling data from redis cache: %v", err)
+	}
+
+	return cryptoData, nil
+}

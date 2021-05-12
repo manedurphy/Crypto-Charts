@@ -117,7 +117,17 @@ func (*btcServer) GetBitCoinData(ctx context.Context, req *pb.BitcoinRequest) (*
 	return &pb.BitcoinResponse{Data: btcResp}, nil
 }
 
-func (*cryptoServer) GetCryptoData(context.Context, *pb.CryptoRequest) (*pb.CryptoResponse, error) {
+func (*cryptoServer) GetCryptoData(ctx context.Context, req *pb.CryptoRequest) (*pb.CryptoResponse, error) {
+	redisData, err := rdb.Get(ctx, "crypto").Result()
+
+	if err != redis.Nil {
+		redisResp, err := store.GetCryptoData([]byte(redisData))
+
+		if err == nil {
+			return redisResp, nil
+		}
+	}
+
 	url := "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,DOGE&tsyms=USD,EUR"
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -143,6 +153,13 @@ func (*cryptoServer) GetCryptoData(context.Context, *pb.CryptoRequest) (*pb.Cryp
 
 	if err != nil {
 		return nil, err
+	}
+
+	cacheData, _ := json.Marshal(cryptoResp)
+	err = rdb.Set(ctx, "crypto", cacheData, 5*time.Minute).Err()
+
+	if err != nil {
+		fmt.Printf("could not set data in redis store: %v\n", err)
 	}
 
 	return cryptoResp, nil
