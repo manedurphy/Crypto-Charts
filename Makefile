@@ -7,7 +7,7 @@ grpc:
 build:
 	go build -o gateway/_output/gateway gateway/gateway.go
 	go build -o server/_output/server server/server.go
-	cd js && yarn run build
+	cd js && REACT_APP_DOCKER_ENV=true yarn run build
 
 cluster:
 	kind create cluster --config kind.yaml
@@ -22,6 +22,7 @@ weave:
 ingress-controller:
 	kubectl create namespace ingress-nginx
 	helm install --namespace=ingress-nginx ingress-nginx ingress-nginx/ingress-nginx
+	kubectl wait --namespace=ingress-nginx --for=condition=Ready --timeout=5m pod -l app.kubernetes.io/name=ingress-nginx
 
 ingress-destroy:
 	helm uninstall --namespace=ingress-nginx ingress-nginx
@@ -49,7 +50,7 @@ compose-dev: build
 	docker-compose up --build
 
 compose-prod: build
-	docker-compose -f ../docker-compose.prod.yaml up --build
+	docker-compose -f docker-compose.prod.yaml up --build
 
 teardown:
 	docker-compose down && docker image prune -a
@@ -77,22 +78,23 @@ load: gateway-image server-image js-image redis-image
 
 deploy:
 	kubectl create namespace btc-charts
-	kubectl apply -f k8s/spc.yaml
-	kubectl apply -f k8s/configmaps.yaml
-	kubectl apply -f k8s/services.yaml
-	kubectl apply -f k8s/deployments.yaml
-	kubectl apply -f k8s/ingress.yaml
-	kubectl apply -f k8s/hpas.yaml
-	# kubectl apply -f k8s/networkpolicies.yaml
+	# kubectl --namespace=btc-charts apply -f k8s/spc.yaml
+	kubectl --namespace=btc-charts create secret generic redis-credentials --from-literal redis-password=password
+	kubectl --namespace=btc-charts apply -f k8s/configmaps.yaml
+	kubectl --namespace=btc-charts apply -f k8s/services.yaml
+	kubectl --namespace=btc-charts apply -f k8s/deployments.yaml
+	kubectl --namespace=btc-charts apply -f k8s/ingress.yaml
+	kubectl --namespace=btc-charts apply -f k8s/hpas.yaml
+	# kubectl --namespace=btc-charts apply -f k8s/networkpolicies.yaml
 
 destroy:
-	kubectl delete -f k8s/spc.yaml
-	kubectl delete -f k8s/configmaps.yaml
-	kubectl delete -f k8s/services.yaml
-	kubectl delete -f k8s/deployments.yaml
-	kubectl delete -f k8s/ingress.yaml
-	kubectl delete -f k8s/hpas.yaml
-	# kubectl delete -f k8s/networkpolicies.yaml
+	# kubectl --namespace=btc-charts delete -f k8s/spc.yaml
+	kubectl --namespace=btc-charts delete -f k8s/configmaps.yaml
+	kubectl --namespace=btc-charts delete -f k8s/services.yaml
+	kubectl --namespace=btc-charts delete -f k8s/deployments.yaml
+	kubectl --namespace=btc-charts delete -f k8s/ingress.yaml
+	kubectl --namespace=btc-charts delete -f k8s/hpas.yaml
+	# kubectl --namespace=btc-charts delete -f k8s/networkpolicies.yaml
 	kubectl delete namespace btc-charts
 
 forward:
@@ -105,8 +107,22 @@ metrics:
 del-metrics:
 	kubectl delete -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 
-password:
-	kubectl create secret generic redis-credentials --from-literal redis-password=password
+tls-ca:
+	openssl req -x509 -newkey rsa:4096 -days 1825 -subj "/CN=${SERVER_CN}" -keyout certs/cakey.pem -out certs/cacert.pem
+	openssl x509 -in certs/cacert.pem -noout -text
+
+tls-server: 
+	openssl req -newkey rsa:4096 -keyout certs/serverkey.pem -out certs/servercsr.pem -subj "/CN=${SERVER_CN}"
+	openssl x509 -req -in certs/servercsr.pem -CA certs/cacert.pem -CAkey certs/cakey.pem -CAcreateserial -out certs/servercert.pem -days 365
+	openssl x509 -in certs/servercert.pem -noout -text
+	mv certs/servercert.pem server/tls
+	mv certs/serverkey.pem server/tls
+
+tls:
+	cd certs && ./gen.sh
+	cp certs/server.key server/tls
+	cp certs/server.crt server/tls
+	cp certs/ca.crt gateway/tls
 
 vault-deploy:
 	kubectl create namespace vault

@@ -12,6 +12,7 @@ import (
 	"github.com/manedurphy/grpc-web/pb"
 	"github.com/rs/cors"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 func main() {
@@ -22,11 +23,20 @@ func main() {
 
 func run() error {
 	fmt.Println("starting grpc gateway on port 8081")
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
 
 	mux := runtime.NewServeMux()
-	conn, err := grpc.DialContext(ctx, os.Getenv("server-url"), grpc.WithInsecure()) // Try to use TLS
+
+	creds, _ := credentials.NewClientTLSFromFile("tls/ca.crt", "")
+
+	var conn *grpc.ClientConn
+	var err error
+	if true {
+		conn, err = grpc.DialContext(ctx, os.Getenv("BTC_SERVER"), grpc.WithInsecure())
+	} else {
+		conn, err = grpc.DialContext(ctx, os.Getenv("BTC_SERVER"), grpc.WithTransportCredentials(creds))
+	}
 
 	if err != nil {
 		log.Fatalf("failed to dial gRPC server: %v", err)

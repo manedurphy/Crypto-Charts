@@ -2,7 +2,7 @@ import './App.css';
 import { LineChart, Line, XAxis, YAxis } from 'recharts';
 import { useEffect, useState } from 'react';
 
-const url = process.env.NODE_ENV === 'development' ? 'http://localhost:8081/api/btc' : '/api/btc';
+const url = process.env.REACT_APP_DOCKER_ENV ? 'http://localhost:8081/api/btc' : '/api/btc';
 
 function App() {
     const [btcData, setBtcData] = useState([]);

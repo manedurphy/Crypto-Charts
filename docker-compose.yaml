@@ -9,24 +9,26 @@ services:
     - "3000:3000"
     volumes:
     - ./js/src:/app/src
+    environment:
+    - REACT_APP_DOCKER_ENV=true
 
   gateway:
     build:
       context: ./gateway
       dockerfile: Dockerfile
     environment:
-    - server-url=server:8080
+    - BTC_SERVER=btc-server:8080
     ports:
     - "8081:8081"
 
-  server:
+  btc-server:
     build:
       context: ./server
       dockerfile: Dockerfile
     environment:
-    - redis-url=redis:6379
+    - REDIS_URL=redis:6379
     volumes:
-    - ./server/redis:/mnt/secrets-store/redis
+    - ./server/redis-creds:/mnt/secrets-store/redis
 
   redis:
     build:

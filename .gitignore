@@ -3,3 +3,6 @@ build
 .DS_STORE
 node_modules
 kubeconfig
+certs/*
+tls/*
+!gen.sh
