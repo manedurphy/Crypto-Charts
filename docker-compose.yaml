@@ -27,7 +27,12 @@ services:
       dockerfile: Dockerfile
     environment:
     - REDIS_URL=redis:6379
-    - CRYPTO_COMPARE_URL=https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,DOGE&tsyms=USD,EUR
+    - CRYPTO_API_KEY=${CRYPTO_API_KEY}
+    - CRYPTO_THREE_URL=https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,DOGE&tsyms=USD,EUR
+    - CRYPTO_BTC_MONTHLY=https://min-api.cryptocompare.com/data/v2/histoday?fsym=BTC&tsym=USD&limit=31
+    - CRYPTO_ETH_MONTHLY=https://min-api.cryptocompare.com/data/v2/histoday?fsym=ETH&tsym=USD&limit=31
+    - CRYPTO_DOGE_MONTHLY=https://min-api.cryptocompare.com/data/v2/histoday?fsym=DOGE&tsym=USD&limit=31
+    - REDIS_MOUNT_PATH=/mnt/secrets-store/redis
     volumes:
     - ./server/redis-creds:/mnt/secrets-store/redis
 

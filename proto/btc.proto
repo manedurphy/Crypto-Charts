@@ -5,27 +5,6 @@ option go_package = "github.com/manedurphy/grpc-web/pb";
 
 import "google/api/annotations.proto";
 
-// message BitcoinDatum {
-// 	string date = 1;
-// 	double value = 2;
-// }
-
-
-// message BitcoinRequest {
-// }
-
-// message BitcoinResponse {
-// 	repeated BitcoinDatum data = 1;
-// }
-
-// service BitcoinService {
-// 	rpc GetBitCoinData (BitcoinRequest) returns (BitcoinResponse) {
-// 		option (google.api.http) = {
-// 			get: "/api/btc"
-// 		};
-// 	};
-// }
-
 message CryptoRequest {
 }
 
@@ -62,10 +41,6 @@ message MonthlyDatum {
 	int64 TimeTo = 3;
 	repeated CurrencyMonthlyDatum Data = 4;
 }
-
-// message BitcoinMonthlyData {
-// 	BitcoinMonthlyDatum Data = 1;
-// }
 
 message MonthlyDataResponse {
 	MonthlyDatum Data = 1;
