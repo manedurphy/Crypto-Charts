@@ -4,6 +4,7 @@ build
 node_modules
 kubeconfig
 certs/*
-tls/*
+server/tls/*
+gateway/tls/*
 !gen.sh
 .env

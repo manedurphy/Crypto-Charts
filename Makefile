@@ -77,25 +77,26 @@ load: gateway-image server-image js-image redis-image
 	kind load docker-image k8s/redis:latest
 
 deploy:
-	kubectl create namespace btc-charts
-	kubectl --namespace=btc-charts apply -f k8s/spc.yaml
-	kubectl --namespace=btc-charts create secret generic redis-credentials --from-literal redis-password=password
-	kubectl --namespace=btc-charts apply -f k8s/configmaps.yaml
-	kubectl --namespace=btc-charts apply -f k8s/services.yaml
-	kubectl --namespace=btc-charts apply -f k8s/deployments.yaml
-	kubectl --namespace=btc-charts apply -f k8s/ingress.yaml
-	kubectl --namespace=btc-charts apply -f k8s/hpas.yaml
-	# kubectl --namespace=btc-charts apply -f k8s/networkpolicies.yaml
+	kubectl create namespace crypto-charts
+	kubectl create --namespace=crypto-charts secret generic crypto-token --from-literal CRYPTO_API_KEY=$$CRYPTO_API_KEY
+	kubectl --namespace=crypto-charts apply -f k8s/spc.yaml
+	kubectl --namespace=crypto-charts create secret generic redis-credentials --from-literal redis-password=password
+	kubectl --namespace=crypto-charts apply -f k8s/configmaps.yaml
+	kubectl --namespace=crypto-charts apply -f k8s/services.yaml
+	kubectl --namespace=crypto-charts apply -f k8s/deployments.yaml
+	kubectl --namespace=crypto-charts apply -f k8s/ingress.yaml
+	kubectl --namespace=crypto-charts apply -f k8s/hpas.yaml
+	# kubectl --namespace=crypto-charts apply -f k8s/networkpolicies.yaml
 
 destroy:
-	kubectl --namespace=btc-charts delete -f k8s/spc.yaml
-	kubectl --namespace=btc-charts delete -f k8s/configmaps.yaml
-	kubectl --namespace=btc-charts delete -f k8s/services.yaml
-	kubectl --namespace=btc-charts delete -f k8s/deployments.yaml
-	kubectl --namespace=btc-charts delete -f k8s/ingress.yaml
-	kubectl --namespace=btc-charts delete -f k8s/hpas.yaml
-	# kubectl --namespace=btc-charts delete -f k8s/networkpolicies.yaml
-	kubectl delete namespace btc-charts
+	# kubectl --namespace=crypto-charts delete -f k8s/spc.yaml
+	# kubectl --namespace=crypto-charts delete -f k8s/configmaps.yaml
+	# kubectl --namespace=crypto-charts delete -f k8s/services.yaml
+	# kubectl --namespace=crypto-charts delete -f k8s/deployments.yaml
+	# kubectl --namespace=crypto-charts delete -f k8s/ingress.yaml
+	# kubectl --namespace=crypto-charts delete -f k8s/hpas.yaml
+	# kubectl --namespace=crypto-charts delete -f k8s/networkpolicies.yaml
+	kubectl delete namespace crypto-charts --force --grace-period=0
 
 forward:
 	kubectl config set-context --current --namespace=ingress-nginx
@@ -151,7 +152,7 @@ vault-policy:
 vault-role:
 	kubectl exec --namespace=vault vault-0 -- vault write auth/kubernetes/role/redis-role \
 		bound_service_account_names=redis-sa \
-		bound_service_account_namespaces=btc-charts \
+		bound_service_account_namespaces=crypto-charts \
 		policies=redis-policy \
 		ttl=20m	
 
@@ -164,6 +165,7 @@ csi-driver:
 secrets-store: vault csi-driver
 
 ss-destroy:
-	helm uninstall --namespace=vault vault
-	helm uninstall --namespace=vault csi
-	kubectl delete namespace vault
+	# helm uninstall --namespace=vault vault
+	# helm uninstall --namespace=vault csi
+	kubectl delete namespace vault --force --grace-period=0
+

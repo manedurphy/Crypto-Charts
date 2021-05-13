@@ -21,8 +21,7 @@ var (
 )
 
 func GetPassword() string {
-	file, err := os.Open(os.Getenv("REDIS_MOUNT_PATH"))
-	// file, err := os.Open("/mnt/secrets-store/redis")
+	file, err := os.Open("/mnt/secrets-store/redis")
 
 	if err != nil {
 		return ""
