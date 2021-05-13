@@ -5,6 +5,8 @@ node_modules
 kubeconfig
 certs/*
 server/tls/*
+!server/tls/.gitkeep
 gateway/tls/*
+!gateway/tls/.gitkeep
 !gen.sh
 .env
