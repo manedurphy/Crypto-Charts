@@ -5,26 +5,26 @@ option go_package = "github.com/manedurphy/grpc-web/pb";
 
 import "google/api/annotations.proto";
 
-message BitcoinDatum {
-	string date = 1;
-	double value = 2;
-}
+// message BitcoinDatum {
+// 	string date = 1;
+// 	double value = 2;
+// }
 
 
-message BitcoinRequest {
-}
+// message BitcoinRequest {
+// }
 
-message BitcoinResponse {
-	repeated BitcoinDatum data = 1;
-}
+// message BitcoinResponse {
+// 	repeated BitcoinDatum data = 1;
+// }
 
-service BitcoinService {
-	rpc GetBitCoinData (BitcoinRequest) returns (BitcoinResponse) {
-		option (google.api.http) = {
-			get: "/api/btc"
-		};
-	};
-}
+// service BitcoinService {
+// 	rpc GetBitCoinData (BitcoinRequest) returns (BitcoinResponse) {
+// 		option (google.api.http) = {
+// 			get: "/api/btc"
+// 		};
+// 	};
+// }
 
 message CryptoRequest {
 }
@@ -40,10 +40,47 @@ message CryptoResponse {
 	CryptoDatum DOGE = 3;
 }
 
+message MonthlyDataRequest {
+	string currency = 1;
+}
+
+message CurrencyMonthlyDatum {
+	int64 time = 1;
+	double high = 2;
+	double low = 3;
+	double open = 4;
+	double volumefrom = 5;
+	double volumeto = 6;
+	double close = 7;
+	string conversion_type = 8;
+	string conversion_symbol = 9;
+}
+
+message MonthlyDatum {
+	bool Aggregated = 1;
+	int64 TimeFrom = 2;
+	int64 TimeTo = 3;
+	repeated CurrencyMonthlyDatum Data = 4;
+}
+
+// message BitcoinMonthlyData {
+// 	BitcoinMonthlyDatum Data = 1;
+// }
+
+message MonthlyDataResponse {
+	MonthlyDatum Data = 1;
+}
+
 service CryptoService {
 	rpc GetCryptoData (CryptoRequest) returns (CryptoResponse) {
 		option (google.api.http) = {
 			get: "/api/crypto"
+		};
+	};
+
+	rpc GetMonthlyData (MonthlyDataRequest) returns (MonthlyDataResponse) {
+		option (google.api.http) = {
+			get: "/api/crypto/monthly/{currency}"
 		};
 	};
 }

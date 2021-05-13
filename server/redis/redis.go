@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"sort"
 
 	"github.com/manedurphy/grpc-web/pb"
 )
 
 func GetPassword() string {
-	file, err := os.Open("/mnt/secrets-store/redis")
+	file, err := os.Open(os.Getenv("REDIS_MOUNT_PATH"))
+	// file, err := os.Open("/mnt/secrets-store/redis")
 
 	if err != nil {
 		return ""
@@ -25,28 +25,28 @@ func GetPassword() string {
 	return string(secret)
 }
 
-func HandleRedisData(redisData []byte) (*pb.BitcoinResponse, error) {
-	var data []*pb.BitcoinDatum
-	err := json.Unmarshal(redisData, &data)
+// func HandleRedisData(redisData []byte) (*pb.BitcoinResponse, error) {
+// 	var data []*pb.BitcoinDatum
+// 	err := json.Unmarshal(redisData, &data)
 
-	if err != nil {
-		return nil, fmt.Errorf("error unmarshaling data from redis cache: %v", err)
-	}
+// 	if err != nil {
+// 		return nil, fmt.Errorf("error unmarshaling data from redis cache: %v", err)
+// 	}
 
-	resp := []*pb.BitcoinDatum{}
+// 	resp := []*pb.BitcoinDatum{}
 
-	for _, v := range data {
-		resp = append(resp, &pb.BitcoinDatum{Date: v.Date, Value: v.Value})
-	}
+// 	for _, v := range data {
+// 		resp = append(resp, &pb.BitcoinDatum{Date: v.Date, Value: v.Value})
+// 	}
 
-	sort.Slice(resp, func(i int, j int) bool {
-		return resp[i].Date < resp[j].Date
-	})
+// 	sort.Slice(resp, func(i int, j int) bool {
+// 		return resp[i].Date < resp[j].Date
+// 	})
 
-	fmt.Println("Sending data from redis store!")
+// 	fmt.Println("Sending data from redis store!")
 
-	return &pb.BitcoinResponse{Data: data}, nil
-}
+// 	return &pb.BitcoinResponse{Data: data}, nil
+// }
 
 func GetCryptoData(redisdata []byte) (*pb.CryptoResponse, error) {
 	var cryptoData *pb.CryptoResponse
@@ -56,5 +56,6 @@ func GetCryptoData(redisdata []byte) (*pb.CryptoResponse, error) {
 		return nil, fmt.Errorf("error unmarshaling data from redis cache: %v", err)
 	}
 
+	fmt.Println("Sending data from redis store!")
 	return cryptoData, nil
 }

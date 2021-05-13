@@ -48,11 +48,11 @@ func run() error {
 	if err != nil {
 		log.Fatalf("failed to dial gRPC server: %v", err)
 	}
-	err = pb.RegisterBitcoinServiceHandler(ctx, mux, conn)
+	// err = pb.RegisterBitcoinServiceHandler(ctx, mux, conn)
 
-	if err != nil {
-		log.Fatalf("could not dial endpoint: %v", err)
-	}
+	// if err != nil {
+	// 	log.Fatalf("could not dial endpoint: %v", err)
+	// }
 
 	err = pb.RegisterCryptoServiceHandler(ctx, mux, conn)
 

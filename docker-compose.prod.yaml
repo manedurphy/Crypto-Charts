@@ -21,6 +21,7 @@ services:
       dockerfile: Dockerfile
     environment:
     - REDIS_URL=redis:6379
+    - CRYPTO_COMPARE_URL=https://min-api.cryptocompare.com/data/pricemulti?fsyms=BTC,ETH,DOGE&tsyms=USD,EUR
     volumes:
     - ./server/redis-creds:/mnt/secrets-store/redis
 
