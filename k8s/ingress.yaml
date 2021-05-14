@@ -7,10 +7,10 @@ metadata:
 spec:
   # tls:
   # - hosts:
-  #   - btc.charts.com
-  #   secretName: btc-charts-com-tls
+  #   - crypto.charts.com
+  #   secretName: crypto-charts-com-tls
   rules:
-  # - host: btc.charts.com
+  # - host: crypto.charts.com
   - http:
       paths:
       - path: /

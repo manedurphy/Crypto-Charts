@@ -13,16 +13,16 @@ func HandleCryptoData(body []byte) (*pb.CryptoResponse, error) {
 
 	cryptoData := []*pb.CryptoDatum{}
 
-	btcDatum := pb.CryptoDatum{Name: "BTC", USD: externalCryptoResponse.BTC.USD, EUR: externalCryptoResponse.BTC.EUR}
-	ethDatum := pb.CryptoDatum{Name: "ETH", USD: externalCryptoResponse.ETH.USD, EUR: externalCryptoResponse.ETH.EUR}
-	dogeDatum := pb.CryptoDatum{Name: "DOGE", USD: externalCryptoResponse.DOGE.USD, EUR: externalCryptoResponse.DOGE.EUR}
+	btcDatum := pb.CryptoDatum{Name: "BTC", USD: externalCryptoResponse.GetBTC().GetUSD(), EUR: externalCryptoResponse.GetBTC().GetEUR()}
+	ethDatum := pb.CryptoDatum{Name: "ETH", USD: externalCryptoResponse.GetETH().GetUSD(), EUR: externalCryptoResponse.GetETH().GetEUR()}
+	dogeDatum := pb.CryptoDatum{Name: "DOGE", USD: externalCryptoResponse.GetDOGE().GetUSD(), EUR: externalCryptoResponse.GetDOGE().GetEUR()}
 
 	cryptoData = append(cryptoData, &btcDatum)
 	cryptoData = append(cryptoData, &ethDatum)
 	cryptoData = append(cryptoData, &dogeDatum)
 
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not handle crypto data: %v", err)
 	}
 
 	return &pb.CryptoResponse{

@@ -144,24 +144,24 @@ spec:
             configMapKeyRef:
               name: urls
               key: BTC_SERVER
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: redis-deployment
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: redis-deployment
 
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: redis
-  template:
-    metadata:
-      labels:
-        app: redis
-    spec:
-      containers:
-      - name: redis-container
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: redis
+#   template:
+#     metadata:
+#       labels:
+#         app: redis
+#     spec:
+#       containers:
+#       - name: redis-container
         # image: manedurphy/grpc-redis
-        image: k8s/redis:latest
-        imagePullPolicy: Never
+        # image: k8s/redis:latest
+        # imagePullPolicy: Never
