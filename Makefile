@@ -86,6 +86,12 @@ deploy:
 	kubectl --namespace=crypto-charts apply -f k8s/deployments.yaml
 	kubectl --namespace=crypto-charts apply -f k8s/ingress.yaml
 	kubectl --namespace=crypto-charts apply -f k8s/hpas.yaml
+	kubectl --namespace=crypto-charts apply -f k8s/statefulsets/redis-statefulset.yaml
+	# sleep 5s
+	kubectl wait --namespace=crypto-charts --for=condition=Ready --timeout=5m pod -l statefulset.kubernetes.io/pod-name=redis-0
+	kubectl wait --namespace=crypto-charts --for=condition=Ready --timeout=5m pod -l statefulset.kubernetes.io/pod-name=redis-1
+	kubectl wait --namespace=crypto-charts --for=condition=Ready --timeout=5m pod -l statefulset.kubernetes.io/pod-name=redis-2
+	kubectl --namespace=crypto-charts apply -f k8s/statefulsets/sentinel-statefulset.yaml
 	# kubectl --namespace=crypto-charts apply -f k8s/networkpolicies.yaml
 
 destroy:
@@ -96,6 +102,7 @@ destroy:
 	# kubectl --namespace=crypto-charts delete -f k8s/ingress.yaml
 	# kubectl --namespace=crypto-charts delete -f k8s/hpas.yaml
 	# kubectl --namespace=crypto-charts delete -f k8s/networkpolicies.yaml
+	# kubectl --namespace=crypto-charts delete -f k8s/statefulsets.yaml
 	kubectl delete namespace crypto-charts --force --grace-period=0
 
 forward:
@@ -169,3 +176,4 @@ ss-destroy:
 	# helm uninstall --namespace=vault csi
 	kubectl delete namespace vault --force --grace-period=0
 
+crypto-charts: cluster secrets-store ingress-controller load deploy

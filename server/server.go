@@ -121,7 +121,7 @@ func (*cryptoServer) GetMonthlyData(ctx context.Context, req *pb.MonthlyDataRequ
 		return nil, fmt.Errorf("currency not available")
 	}
 
-	redisData, err := store.CheckStore(ctx, url+"monthly")
+	redisData, err := store.CheckStore(ctx, req.GetCurrency()+"-monthly")
 
 	if err != redis.Nil {
 		redisResp, err := store.GetMonthlyData([]byte(redisData))
@@ -165,7 +165,7 @@ func (*cryptoServer) GetMonthlyData(ctx context.Context, req *pb.MonthlyDataRequ
 		return nil, fmt.Errorf("error handling external data: %v", err)
 	}
 
-	err = store.SetStoreData(ctx, url+"monthly", monthlyResp)
+	err = store.SetStoreData(ctx, req.GetCurrency()+"-monthly", monthlyResp)
 
 	if err != nil {
 		fmt.Printf("could not set data in redis store: %v\n", err)

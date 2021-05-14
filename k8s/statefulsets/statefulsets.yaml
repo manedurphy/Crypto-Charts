@@ -120,8 +120,8 @@ spec:
         command: [ "sh", "-c" ]
         args:
           - |
-            REDIS_PASSWORD=a-good-password
-            nodes=redis-0.redis.redis.svc.cluster.local,redis-1.redis.redis.svc.cluster.local,redis-2.redis.redis.svc.cluster.local
+            REDIS_PASSWORD=password
+            nodes=redis-0.redis.crypto-charts.svc.cluster.local,redis-1.redis.crypto-charts.svc.cluster.local,redis-2.redis.crypto-charts.svc.cluster.local
             for i in ${nodes//,/ }
             do
                 echo "finding master at $i"
