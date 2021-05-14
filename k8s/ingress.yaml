@@ -7,10 +7,10 @@ metadata:
 spec:
   # tls:
   # - hosts:
-  #   - btc.charts.com
-  #   secretName: btc-charts-com-tls
+  #   - crypto.charts.com
+  #   secretName: crypto-charts-com-tls
   rules:
-  # - host: btc.charts.com
+  # - host: crypto.charts.com
   - http:
       paths:
       - path: /
@@ -20,7 +20,7 @@ spec:
             name: js
             port:
               number: 80
-      - path: /api/btc
+      - path: /api
         pathType: Prefix
         backend:
           service:

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -15,7 +16,12 @@ import (
 	"google.golang.org/grpc/credentials"
 )
 
+var (
+	secure = flag.Bool("secure", true, "set to true to use TLS connection")
+)
+
 func main() {
+	flag.Parse()
 	if err := run(); err != nil {
 		log.Fatalf("could not start gateway: %v", err)
 	}
@@ -32,16 +38,19 @@ func run() error {
 
 	var conn *grpc.ClientConn
 	var err error
-	if true {
+	if !*secure {
+		fmt.Println("Insecure connection established with server")
 		conn, err = grpc.DialContext(ctx, os.Getenv("BTC_SERVER"), grpc.WithInsecure())
 	} else {
+		fmt.Println("TLS connection established with server")
 		conn, err = grpc.DialContext(ctx, os.Getenv("BTC_SERVER"), grpc.WithTransportCredentials(creds))
 	}
 
 	if err != nil {
 		log.Fatalf("failed to dial gRPC server: %v", err)
 	}
-	err = pb.RegisterBitcoinServiceHandler(ctx, mux, conn)
+
+	err = pb.RegisterCryptoServiceHandler(ctx, mux, conn)
 
 	if err != nil {
 		log.Fatalf("could not dial endpoint: %v", err)

@@ -14,86 +14,122 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// BitcoinServiceClient is the client API for BitcoinService service.
+// CryptoServiceClient is the client API for CryptoService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type BitcoinServiceClient interface {
-	GetBitCoinData(ctx context.Context, in *BitcoinRequest, opts ...grpc.CallOption) (*BitcoinResponse, error)
+type CryptoServiceClient interface {
+	GetCryptoData(ctx context.Context, in *CryptoRequest, opts ...grpc.CallOption) (*CryptoResponse, error)
+	GetMonthlyData(ctx context.Context, in *MonthlyDataRequest, opts ...grpc.CallOption) (*MonthlyDataResponse, error)
 }
 
-type bitcoinServiceClient struct {
+type cryptoServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewBitcoinServiceClient(cc grpc.ClientConnInterface) BitcoinServiceClient {
-	return &bitcoinServiceClient{cc}
+func NewCryptoServiceClient(cc grpc.ClientConnInterface) CryptoServiceClient {
+	return &cryptoServiceClient{cc}
 }
 
-func (c *bitcoinServiceClient) GetBitCoinData(ctx context.Context, in *BitcoinRequest, opts ...grpc.CallOption) (*BitcoinResponse, error) {
-	out := new(BitcoinResponse)
-	err := c.cc.Invoke(ctx, "/btc.BitcoinService/GetBitCoinData", in, out, opts...)
+func (c *cryptoServiceClient) GetCryptoData(ctx context.Context, in *CryptoRequest, opts ...grpc.CallOption) (*CryptoResponse, error) {
+	out := new(CryptoResponse)
+	err := c.cc.Invoke(ctx, "/btc.CryptoService/GetCryptoData", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// BitcoinServiceServer is the server API for BitcoinService service.
-// All implementations must embed UnimplementedBitcoinServiceServer
+func (c *cryptoServiceClient) GetMonthlyData(ctx context.Context, in *MonthlyDataRequest, opts ...grpc.CallOption) (*MonthlyDataResponse, error) {
+	out := new(MonthlyDataResponse)
+	err := c.cc.Invoke(ctx, "/btc.CryptoService/GetMonthlyData", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// CryptoServiceServer is the server API for CryptoService service.
+// All implementations must embed UnimplementedCryptoServiceServer
 // for forward compatibility
-type BitcoinServiceServer interface {
-	GetBitCoinData(context.Context, *BitcoinRequest) (*BitcoinResponse, error)
-	mustEmbedUnimplementedBitcoinServiceServer()
+type CryptoServiceServer interface {
+	GetCryptoData(context.Context, *CryptoRequest) (*CryptoResponse, error)
+	GetMonthlyData(context.Context, *MonthlyDataRequest) (*MonthlyDataResponse, error)
+	mustEmbedUnimplementedCryptoServiceServer()
 }
 
-// UnimplementedBitcoinServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedBitcoinServiceServer struct {
+// UnimplementedCryptoServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedCryptoServiceServer struct {
 }
 
-func (UnimplementedBitcoinServiceServer) GetBitCoinData(context.Context, *BitcoinRequest) (*BitcoinResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetBitCoinData not implemented")
+func (UnimplementedCryptoServiceServer) GetCryptoData(context.Context, *CryptoRequest) (*CryptoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCryptoData not implemented")
 }
-func (UnimplementedBitcoinServiceServer) mustEmbedUnimplementedBitcoinServiceServer() {}
+func (UnimplementedCryptoServiceServer) GetMonthlyData(context.Context, *MonthlyDataRequest) (*MonthlyDataResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMonthlyData not implemented")
+}
+func (UnimplementedCryptoServiceServer) mustEmbedUnimplementedCryptoServiceServer() {}
 
-// UnsafeBitcoinServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to BitcoinServiceServer will
+// UnsafeCryptoServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to CryptoServiceServer will
 // result in compilation errors.
-type UnsafeBitcoinServiceServer interface {
-	mustEmbedUnimplementedBitcoinServiceServer()
+type UnsafeCryptoServiceServer interface {
+	mustEmbedUnimplementedCryptoServiceServer()
 }
 
-func RegisterBitcoinServiceServer(s grpc.ServiceRegistrar, srv BitcoinServiceServer) {
-	s.RegisterService(&BitcoinService_ServiceDesc, srv)
+func RegisterCryptoServiceServer(s grpc.ServiceRegistrar, srv CryptoServiceServer) {
+	s.RegisterService(&CryptoService_ServiceDesc, srv)
 }
 
-func _BitcoinService_GetBitCoinData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BitcoinRequest)
+func _CryptoService_GetCryptoData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CryptoRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(BitcoinServiceServer).GetBitCoinData(ctx, in)
+		return srv.(CryptoServiceServer).GetCryptoData(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/btc.BitcoinService/GetBitCoinData",
+		FullMethod: "/btc.CryptoService/GetCryptoData",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BitcoinServiceServer).GetBitCoinData(ctx, req.(*BitcoinRequest))
+		return srv.(CryptoServiceServer).GetCryptoData(ctx, req.(*CryptoRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// BitcoinService_ServiceDesc is the grpc.ServiceDesc for BitcoinService service.
+func _CryptoService_GetMonthlyData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MonthlyDataRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CryptoServiceServer).GetMonthlyData(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/btc.CryptoService/GetMonthlyData",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CryptoServiceServer).GetMonthlyData(ctx, req.(*MonthlyDataRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// CryptoService_ServiceDesc is the grpc.ServiceDesc for CryptoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var BitcoinService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "btc.BitcoinService",
-	HandlerType: (*BitcoinServiceServer)(nil),
+var CryptoService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "btc.CryptoService",
+	HandlerType: (*CryptoServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetBitCoinData",
-			Handler:    _BitcoinService_GetBitCoinData_Handler,
+			MethodName: "GetCryptoData",
+			Handler:    _CryptoService_GetCryptoData_Handler,
+		},
+		{
+			MethodName: "GetMonthlyData",
+			Handler:    _CryptoService_GetMonthlyData_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

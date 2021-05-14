@@ -21,17 +21,14 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type BitcoinDatum struct {
+type CryptoRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
-
-	Date  string  `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
-	Value float64 `protobuf:"fixed64,2,opt,name=value,proto3" json:"value,omitempty"`
 }
 
-func (x *BitcoinDatum) Reset() {
-	*x = BitcoinDatum{}
+func (x *CryptoRequest) Reset() {
+	*x = CryptoRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_btc_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -39,13 +36,13 @@ func (x *BitcoinDatum) Reset() {
 	}
 }
 
-func (x *BitcoinDatum) String() string {
+func (x *CryptoRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BitcoinDatum) ProtoMessage() {}
+func (*CryptoRequest) ProtoMessage() {}
 
-func (x *BitcoinDatum) ProtoReflect() protoreflect.Message {
+func (x *CryptoRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_btc_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -57,33 +54,22 @@ func (x *BitcoinDatum) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BitcoinDatum.ProtoReflect.Descriptor instead.
-func (*BitcoinDatum) Descriptor() ([]byte, []int) {
+// Deprecated: Use CryptoRequest.ProtoReflect.Descriptor instead.
+func (*CryptoRequest) Descriptor() ([]byte, []int) {
 	return file_btc_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *BitcoinDatum) GetDate() string {
-	if x != nil {
-		return x.Date
-	}
-	return ""
-}
-
-func (x *BitcoinDatum) GetValue() float64 {
-	if x != nil {
-		return x.Value
-	}
-	return 0
-}
-
-type BitcoinRequest struct {
+type CryptoPrice struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	USD float64 `protobuf:"fixed64,1,opt,name=USD,proto3" json:"USD,omitempty"`
+	EUR float64 `protobuf:"fixed64,2,opt,name=EUR,proto3" json:"EUR,omitempty"`
 }
 
-func (x *BitcoinRequest) Reset() {
-	*x = BitcoinRequest{}
+func (x *CryptoPrice) Reset() {
+	*x = CryptoPrice{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_btc_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -91,13 +77,13 @@ func (x *BitcoinRequest) Reset() {
 	}
 }
 
-func (x *BitcoinRequest) String() string {
+func (x *CryptoPrice) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BitcoinRequest) ProtoMessage() {}
+func (*CryptoPrice) ProtoMessage() {}
 
-func (x *BitcoinRequest) ProtoReflect() protoreflect.Message {
+func (x *CryptoPrice) ProtoReflect() protoreflect.Message {
 	mi := &file_btc_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -109,21 +95,37 @@ func (x *BitcoinRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BitcoinRequest.ProtoReflect.Descriptor instead.
-func (*BitcoinRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use CryptoPrice.ProtoReflect.Descriptor instead.
+func (*CryptoPrice) Descriptor() ([]byte, []int) {
 	return file_btc_proto_rawDescGZIP(), []int{1}
 }
 
-type BitcoinResponse struct {
+func (x *CryptoPrice) GetUSD() float64 {
+	if x != nil {
+		return x.USD
+	}
+	return 0
+}
+
+func (x *CryptoPrice) GetEUR() float64 {
+	if x != nil {
+		return x.EUR
+	}
+	return 0
+}
+
+type ExternalCryptoResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Data []*BitcoinDatum `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+	BTC  *CryptoPrice `protobuf:"bytes,1,opt,name=BTC,proto3" json:"BTC,omitempty"`
+	ETH  *CryptoPrice `protobuf:"bytes,2,opt,name=ETH,proto3" json:"ETH,omitempty"`
+	DOGE *CryptoPrice `protobuf:"bytes,3,opt,name=DOGE,proto3" json:"DOGE,omitempty"`
 }
 
-func (x *BitcoinResponse) Reset() {
-	*x = BitcoinResponse{}
+func (x *ExternalCryptoResponse) Reset() {
+	*x = ExternalCryptoResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_btc_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -131,13 +133,13 @@ func (x *BitcoinResponse) Reset() {
 	}
 }
 
-func (x *BitcoinResponse) String() string {
+func (x *ExternalCryptoResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*BitcoinResponse) ProtoMessage() {}
+func (*ExternalCryptoResponse) ProtoMessage() {}
 
-func (x *BitcoinResponse) ProtoReflect() protoreflect.Message {
+func (x *ExternalCryptoResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_btc_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -149,12 +151,412 @@ func (x *BitcoinResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use BitcoinResponse.ProtoReflect.Descriptor instead.
-func (*BitcoinResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use ExternalCryptoResponse.ProtoReflect.Descriptor instead.
+func (*ExternalCryptoResponse) Descriptor() ([]byte, []int) {
 	return file_btc_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *BitcoinResponse) GetData() []*BitcoinDatum {
+func (x *ExternalCryptoResponse) GetBTC() *CryptoPrice {
+	if x != nil {
+		return x.BTC
+	}
+	return nil
+}
+
+func (x *ExternalCryptoResponse) GetETH() *CryptoPrice {
+	if x != nil {
+		return x.ETH
+	}
+	return nil
+}
+
+func (x *ExternalCryptoResponse) GetDOGE() *CryptoPrice {
+	if x != nil {
+		return x.DOGE
+	}
+	return nil
+}
+
+type CryptoDatum struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Name string  `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	USD  float64 `protobuf:"fixed64,2,opt,name=USD,proto3" json:"USD,omitempty"`
+	EUR  float64 `protobuf:"fixed64,3,opt,name=EUR,proto3" json:"EUR,omitempty"`
+}
+
+func (x *CryptoDatum) Reset() {
+	*x = CryptoDatum{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_btc_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CryptoDatum) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CryptoDatum) ProtoMessage() {}
+
+func (x *CryptoDatum) ProtoReflect() protoreflect.Message {
+	mi := &file_btc_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CryptoDatum.ProtoReflect.Descriptor instead.
+func (*CryptoDatum) Descriptor() ([]byte, []int) {
+	return file_btc_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *CryptoDatum) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CryptoDatum) GetUSD() float64 {
+	if x != nil {
+		return x.USD
+	}
+	return 0
+}
+
+func (x *CryptoDatum) GetEUR() float64 {
+	if x != nil {
+		return x.EUR
+	}
+	return 0
+}
+
+type CryptoResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Data []*CryptoDatum `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
+}
+
+func (x *CryptoResponse) Reset() {
+	*x = CryptoResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_btc_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CryptoResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CryptoResponse) ProtoMessage() {}
+
+func (x *CryptoResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_btc_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CryptoResponse.ProtoReflect.Descriptor instead.
+func (*CryptoResponse) Descriptor() ([]byte, []int) {
+	return file_btc_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *CryptoResponse) GetData() []*CryptoDatum {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type MonthlyDataRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Currency string `protobuf:"bytes,1,opt,name=currency,proto3" json:"currency,omitempty"`
+}
+
+func (x *MonthlyDataRequest) Reset() {
+	*x = MonthlyDataRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_btc_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MonthlyDataRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MonthlyDataRequest) ProtoMessage() {}
+
+func (x *MonthlyDataRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_btc_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MonthlyDataRequest.ProtoReflect.Descriptor instead.
+func (*MonthlyDataRequest) Descriptor() ([]byte, []int) {
+	return file_btc_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *MonthlyDataRequest) GetCurrency() string {
+	if x != nil {
+		return x.Currency
+	}
+	return ""
+}
+
+type CurrencyMonthlyDatum struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Time             int64   `protobuf:"varint,1,opt,name=time,proto3" json:"time,omitempty"`
+	High             float64 `protobuf:"fixed64,2,opt,name=high,proto3" json:"high,omitempty"`
+	Low              float64 `protobuf:"fixed64,3,opt,name=low,proto3" json:"low,omitempty"`
+	Open             float64 `protobuf:"fixed64,4,opt,name=open,proto3" json:"open,omitempty"`
+	Volumefrom       float64 `protobuf:"fixed64,5,opt,name=volumefrom,proto3" json:"volumefrom,omitempty"`
+	Volumeto         float64 `protobuf:"fixed64,6,opt,name=volumeto,proto3" json:"volumeto,omitempty"`
+	Close            float64 `protobuf:"fixed64,7,opt,name=close,proto3" json:"close,omitempty"`
+	ConversionType   string  `protobuf:"bytes,8,opt,name=conversion_type,json=conversionType,proto3" json:"conversion_type,omitempty"`
+	ConversionSymbol string  `protobuf:"bytes,9,opt,name=conversion_symbol,json=conversionSymbol,proto3" json:"conversion_symbol,omitempty"`
+}
+
+func (x *CurrencyMonthlyDatum) Reset() {
+	*x = CurrencyMonthlyDatum{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_btc_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *CurrencyMonthlyDatum) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CurrencyMonthlyDatum) ProtoMessage() {}
+
+func (x *CurrencyMonthlyDatum) ProtoReflect() protoreflect.Message {
+	mi := &file_btc_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CurrencyMonthlyDatum.ProtoReflect.Descriptor instead.
+func (*CurrencyMonthlyDatum) Descriptor() ([]byte, []int) {
+	return file_btc_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *CurrencyMonthlyDatum) GetTime() int64 {
+	if x != nil {
+		return x.Time
+	}
+	return 0
+}
+
+func (x *CurrencyMonthlyDatum) GetHigh() float64 {
+	if x != nil {
+		return x.High
+	}
+	return 0
+}
+
+func (x *CurrencyMonthlyDatum) GetLow() float64 {
+	if x != nil {
+		return x.Low
+	}
+	return 0
+}
+
+func (x *CurrencyMonthlyDatum) GetOpen() float64 {
+	if x != nil {
+		return x.Open
+	}
+	return 0
+}
+
+func (x *CurrencyMonthlyDatum) GetVolumefrom() float64 {
+	if x != nil {
+		return x.Volumefrom
+	}
+	return 0
+}
+
+func (x *CurrencyMonthlyDatum) GetVolumeto() float64 {
+	if x != nil {
+		return x.Volumeto
+	}
+	return 0
+}
+
+func (x *CurrencyMonthlyDatum) GetClose() float64 {
+	if x != nil {
+		return x.Close
+	}
+	return 0
+}
+
+func (x *CurrencyMonthlyDatum) GetConversionType() string {
+	if x != nil {
+		return x.ConversionType
+	}
+	return ""
+}
+
+func (x *CurrencyMonthlyDatum) GetConversionSymbol() string {
+	if x != nil {
+		return x.ConversionSymbol
+	}
+	return ""
+}
+
+type MonthlyDatum struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Aggregated bool                    `protobuf:"varint,1,opt,name=Aggregated,proto3" json:"Aggregated,omitempty"`
+	TimeFrom   int64                   `protobuf:"varint,2,opt,name=TimeFrom,proto3" json:"TimeFrom,omitempty"`
+	TimeTo     int64                   `protobuf:"varint,3,opt,name=TimeTo,proto3" json:"TimeTo,omitempty"`
+	Data       []*CurrencyMonthlyDatum `protobuf:"bytes,4,rep,name=Data,proto3" json:"Data,omitempty"`
+}
+
+func (x *MonthlyDatum) Reset() {
+	*x = MonthlyDatum{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_btc_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MonthlyDatum) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MonthlyDatum) ProtoMessage() {}
+
+func (x *MonthlyDatum) ProtoReflect() protoreflect.Message {
+	mi := &file_btc_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MonthlyDatum.ProtoReflect.Descriptor instead.
+func (*MonthlyDatum) Descriptor() ([]byte, []int) {
+	return file_btc_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *MonthlyDatum) GetAggregated() bool {
+	if x != nil {
+		return x.Aggregated
+	}
+	return false
+}
+
+func (x *MonthlyDatum) GetTimeFrom() int64 {
+	if x != nil {
+		return x.TimeFrom
+	}
+	return 0
+}
+
+func (x *MonthlyDatum) GetTimeTo() int64 {
+	if x != nil {
+		return x.TimeTo
+	}
+	return 0
+}
+
+func (x *MonthlyDatum) GetData() []*CurrencyMonthlyDatum {
+	if x != nil {
+		return x.Data
+	}
+	return nil
+}
+
+type MonthlyDataResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Data *MonthlyDatum `protobuf:"bytes,1,opt,name=Data,proto3" json:"Data,omitempty"`
+}
+
+func (x *MonthlyDataResponse) Reset() {
+	*x = MonthlyDataResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_btc_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *MonthlyDataResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*MonthlyDataResponse) ProtoMessage() {}
+
+func (x *MonthlyDataResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_btc_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use MonthlyDataResponse.ProtoReflect.Descriptor instead.
+func (*MonthlyDataResponse) Descriptor() ([]byte, []int) {
+	return file_btc_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *MonthlyDataResponse) GetData() *MonthlyDatum {
 	if x != nil {
 		return x.Data
 	}
@@ -166,25 +568,77 @@ var File_btc_proto protoreflect.FileDescriptor
 var file_btc_proto_rawDesc = []byte{
 	0x0a, 0x09, 0x62, 0x74, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x03, 0x62, 0x74, 0x63,
 	0x1a, 0x1c, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x61, 0x6e, 0x6e,
-	0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x38,
-	0x0a, 0x0c, 0x42, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x44, 0x61, 0x74, 0x75, 0x6d, 0x12, 0x12,
-	0x0a, 0x04, 0x64, 0x61, 0x74, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x64, 0x61,
-	0x74, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x01, 0x52, 0x05, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x22, 0x10, 0x0a, 0x0e, 0x42, 0x69, 0x74, 0x63,
-	0x6f, 0x69, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x38, 0x0a, 0x0f, 0x42, 0x69,
-	0x74, 0x63, 0x6f, 0x69, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x25, 0x0a,
-	0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x74,
-	0x63, 0x2e, 0x42, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x44, 0x61, 0x74, 0x75, 0x6d, 0x52, 0x04,
-	0x64, 0x61, 0x74, 0x61, 0x32, 0x5f, 0x0a, 0x0e, 0x42, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x53,
-	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x4d, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x42, 0x69, 0x74,
-	0x43, 0x6f, 0x69, 0x6e, 0x44, 0x61, 0x74, 0x61, 0x12, 0x13, 0x2e, 0x62, 0x74, 0x63, 0x2e, 0x42,
-	0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x14, 0x2e,
-	0x62, 0x74, 0x63, 0x2e, 0x42, 0x69, 0x74, 0x63, 0x6f, 0x69, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x22, 0x10, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x0a, 0x12, 0x08, 0x2f, 0x61, 0x70,
-	0x69, 0x2f, 0x62, 0x74, 0x63, 0x42, 0x23, 0x5a, 0x21, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e,
-	0x63, 0x6f, 0x6d, 0x2f, 0x6d, 0x61, 0x6e, 0x65, 0x64, 0x75, 0x72, 0x70, 0x68, 0x79, 0x2f, 0x67,
-	0x72, 0x70, 0x63, 0x2d, 0x77, 0x65, 0x62, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x33,
+	0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x0f,
+	0x0a, 0x0d, 0x43, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22,
+	0x31, 0x0a, 0x0b, 0x43, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x50, 0x72, 0x69, 0x63, 0x65, 0x12, 0x10,
+	0x0a, 0x03, 0x55, 0x53, 0x44, 0x18, 0x01, 0x20, 0x01, 0x28, 0x01, 0x52, 0x03, 0x55, 0x53, 0x44,
+	0x12, 0x10, 0x0a, 0x03, 0x45, 0x55, 0x52, 0x18, 0x02, 0x20, 0x01, 0x28, 0x01, 0x52, 0x03, 0x45,
+	0x55, 0x52, 0x22, 0x86, 0x01, 0x0a, 0x16, 0x45, 0x78, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x43,
+	0x72, 0x79, 0x70, 0x74, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x22, 0x0a,
+	0x03, 0x42, 0x54, 0x43, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x62, 0x74, 0x63,
+	0x2e, 0x43, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x50, 0x72, 0x69, 0x63, 0x65, 0x52, 0x03, 0x42, 0x54,
+	0x43, 0x12, 0x22, 0x0a, 0x03, 0x45, 0x54, 0x48, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10,
+	0x2e, 0x62, 0x74, 0x63, 0x2e, 0x43, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x50, 0x72, 0x69, 0x63, 0x65,
+	0x52, 0x03, 0x45, 0x54, 0x48, 0x12, 0x24, 0x0a, 0x04, 0x44, 0x4f, 0x47, 0x45, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x62, 0x74, 0x63, 0x2e, 0x43, 0x72, 0x79, 0x70, 0x74, 0x6f,
+	0x50, 0x72, 0x69, 0x63, 0x65, 0x52, 0x04, 0x44, 0x4f, 0x47, 0x45, 0x22, 0x45, 0x0a, 0x0b, 0x43,
+	0x72, 0x79, 0x70, 0x74, 0x6f, 0x44, 0x61, 0x74, 0x75, 0x6d, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61,
+	0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12, 0x10,
+	0x0a, 0x03, 0x55, 0x53, 0x44, 0x18, 0x02, 0x20, 0x01, 0x28, 0x01, 0x52, 0x03, 0x55, 0x53, 0x44,
+	0x12, 0x10, 0x0a, 0x03, 0x45, 0x55, 0x52, 0x18, 0x03, 0x20, 0x01, 0x28, 0x01, 0x52, 0x03, 0x45,
+	0x55, 0x52, 0x22, 0x36, 0x0a, 0x0e, 0x43, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x24, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x18, 0x01, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x10, 0x2e, 0x62, 0x74, 0x63, 0x2e, 0x43, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x44,
+	0x61, 0x74, 0x75, 0x6d, 0x52, 0x04, 0x64, 0x61, 0x74, 0x61, 0x22, 0x30, 0x0a, 0x12, 0x4d, 0x6f,
+	0x6e, 0x74, 0x68, 0x6c, 0x79, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x1a, 0x0a, 0x08, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x63, 0x79, 0x18, 0x01, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x08, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x63, 0x79, 0x22, 0x8c, 0x02, 0x0a,
+	0x14, 0x43, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x63, 0x79, 0x4d, 0x6f, 0x6e, 0x74, 0x68, 0x6c, 0x79,
+	0x44, 0x61, 0x74, 0x75, 0x6d, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x03, 0x52, 0x04, 0x74, 0x69, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x68, 0x69, 0x67,
+	0x68, 0x18, 0x02, 0x20, 0x01, 0x28, 0x01, 0x52, 0x04, 0x68, 0x69, 0x67, 0x68, 0x12, 0x10, 0x0a,
+	0x03, 0x6c, 0x6f, 0x77, 0x18, 0x03, 0x20, 0x01, 0x28, 0x01, 0x52, 0x03, 0x6c, 0x6f, 0x77, 0x12,
+	0x12, 0x0a, 0x04, 0x6f, 0x70, 0x65, 0x6e, 0x18, 0x04, 0x20, 0x01, 0x28, 0x01, 0x52, 0x04, 0x6f,
+	0x70, 0x65, 0x6e, 0x12, 0x1e, 0x0a, 0x0a, 0x76, 0x6f, 0x6c, 0x75, 0x6d, 0x65, 0x66, 0x72, 0x6f,
+	0x6d, 0x18, 0x05, 0x20, 0x01, 0x28, 0x01, 0x52, 0x0a, 0x76, 0x6f, 0x6c, 0x75, 0x6d, 0x65, 0x66,
+	0x72, 0x6f, 0x6d, 0x12, 0x1a, 0x0a, 0x08, 0x76, 0x6f, 0x6c, 0x75, 0x6d, 0x65, 0x74, 0x6f, 0x18,
+	0x06, 0x20, 0x01, 0x28, 0x01, 0x52, 0x08, 0x76, 0x6f, 0x6c, 0x75, 0x6d, 0x65, 0x74, 0x6f, 0x12,
+	0x14, 0x0a, 0x05, 0x63, 0x6c, 0x6f, 0x73, 0x65, 0x18, 0x07, 0x20, 0x01, 0x28, 0x01, 0x52, 0x05,
+	0x63, 0x6c, 0x6f, 0x73, 0x65, 0x12, 0x27, 0x0a, 0x0f, 0x63, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x73,
+	0x69, 0x6f, 0x6e, 0x5f, 0x74, 0x79, 0x70, 0x65, 0x18, 0x08, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e,
+	0x63, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x54, 0x79, 0x70, 0x65, 0x12, 0x2b,
+	0x0a, 0x11, 0x63, 0x6f, 0x6e, 0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x5f, 0x73, 0x79, 0x6d,
+	0x62, 0x6f, 0x6c, 0x18, 0x09, 0x20, 0x01, 0x28, 0x09, 0x52, 0x10, 0x63, 0x6f, 0x6e, 0x76, 0x65,
+	0x72, 0x73, 0x69, 0x6f, 0x6e, 0x53, 0x79, 0x6d, 0x62, 0x6f, 0x6c, 0x22, 0x91, 0x01, 0x0a, 0x0c,
+	0x4d, 0x6f, 0x6e, 0x74, 0x68, 0x6c, 0x79, 0x44, 0x61, 0x74, 0x75, 0x6d, 0x12, 0x1e, 0x0a, 0x0a,
+	0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08,
+	0x52, 0x0a, 0x41, 0x67, 0x67, 0x72, 0x65, 0x67, 0x61, 0x74, 0x65, 0x64, 0x12, 0x1a, 0x0a, 0x08,
+	0x54, 0x69, 0x6d, 0x65, 0x46, 0x72, 0x6f, 0x6d, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08,
+	0x54, 0x69, 0x6d, 0x65, 0x46, 0x72, 0x6f, 0x6d, 0x12, 0x16, 0x0a, 0x06, 0x54, 0x69, 0x6d, 0x65,
+	0x54, 0x6f, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x06, 0x54, 0x69, 0x6d, 0x65, 0x54, 0x6f,
+	0x12, 0x2d, 0x0a, 0x04, 0x44, 0x61, 0x74, 0x61, 0x18, 0x04, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x19,
+	0x2e, 0x62, 0x74, 0x63, 0x2e, 0x43, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x63, 0x79, 0x4d, 0x6f, 0x6e,
+	0x74, 0x68, 0x6c, 0x79, 0x44, 0x61, 0x74, 0x75, 0x6d, 0x52, 0x04, 0x44, 0x61, 0x74, 0x61, 0x22,
+	0x3c, 0x0a, 0x13, 0x4d, 0x6f, 0x6e, 0x74, 0x68, 0x6c, 0x79, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x25, 0x0a, 0x04, 0x44, 0x61, 0x74, 0x61, 0x18, 0x01,
+	0x20, 0x01, 0x28, 0x0b, 0x32, 0x11, 0x2e, 0x62, 0x74, 0x63, 0x2e, 0x4d, 0x6f, 0x6e, 0x74, 0x68,
+	0x6c, 0x79, 0x44, 0x61, 0x74, 0x75, 0x6d, 0x52, 0x04, 0x44, 0x61, 0x74, 0x61, 0x32, 0xcb, 0x01,
+	0x0a, 0x0d, 0x43, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12,
+	0x4d, 0x0a, 0x0d, 0x47, 0x65, 0x74, 0x43, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x44, 0x61, 0x74, 0x61,
+	0x12, 0x12, 0x2e, 0x62, 0x74, 0x63, 0x2e, 0x43, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x13, 0x2e, 0x62, 0x74, 0x63, 0x2e, 0x43, 0x72, 0x79, 0x70, 0x74,
+	0x6f, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x13, 0x82, 0xd3, 0xe4, 0x93, 0x02,
+	0x0d, 0x12, 0x0b, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x63, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x12, 0x6b,
+	0x0a, 0x0e, 0x47, 0x65, 0x74, 0x4d, 0x6f, 0x6e, 0x74, 0x68, 0x6c, 0x79, 0x44, 0x61, 0x74, 0x61,
+	0x12, 0x17, 0x2e, 0x62, 0x74, 0x63, 0x2e, 0x4d, 0x6f, 0x6e, 0x74, 0x68, 0x6c, 0x79, 0x44, 0x61,
+	0x74, 0x61, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18, 0x2e, 0x62, 0x74, 0x63, 0x2e,
+	0x4d, 0x6f, 0x6e, 0x74, 0x68, 0x6c, 0x79, 0x44, 0x61, 0x74, 0x61, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x22, 0x26, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x20, 0x12, 0x1e, 0x2f, 0x61, 0x70,
+	0x69, 0x2f, 0x63, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x2f, 0x6d, 0x6f, 0x6e, 0x74, 0x68, 0x6c, 0x79,
+	0x2f, 0x7b, 0x63, 0x75, 0x72, 0x72, 0x65, 0x6e, 0x63, 0x79, 0x7d, 0x42, 0x23, 0x5a, 0x21, 0x67,
+	0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x6d, 0x61, 0x6e, 0x65, 0x64, 0x75,
+	0x72, 0x70, 0x68, 0x79, 0x2f, 0x67, 0x72, 0x70, 0x63, 0x2d, 0x77, 0x65, 0x62, 0x2f, 0x70, 0x62,
+	0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -199,21 +653,34 @@ func file_btc_proto_rawDescGZIP() []byte {
 	return file_btc_proto_rawDescData
 }
 
-var file_btc_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_btc_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_btc_proto_goTypes = []interface{}{
-	(*BitcoinDatum)(nil),    // 0: btc.BitcoinDatum
-	(*BitcoinRequest)(nil),  // 1: btc.BitcoinRequest
-	(*BitcoinResponse)(nil), // 2: btc.BitcoinResponse
+	(*CryptoRequest)(nil),          // 0: btc.CryptoRequest
+	(*CryptoPrice)(nil),            // 1: btc.CryptoPrice
+	(*ExternalCryptoResponse)(nil), // 2: btc.ExternalCryptoResponse
+	(*CryptoDatum)(nil),            // 3: btc.CryptoDatum
+	(*CryptoResponse)(nil),         // 4: btc.CryptoResponse
+	(*MonthlyDataRequest)(nil),     // 5: btc.MonthlyDataRequest
+	(*CurrencyMonthlyDatum)(nil),   // 6: btc.CurrencyMonthlyDatum
+	(*MonthlyDatum)(nil),           // 7: btc.MonthlyDatum
+	(*MonthlyDataResponse)(nil),    // 8: btc.MonthlyDataResponse
 }
 var file_btc_proto_depIdxs = []int32{
-	0, // 0: btc.BitcoinResponse.data:type_name -> btc.BitcoinDatum
-	1, // 1: btc.BitcoinService.GetBitCoinData:input_type -> btc.BitcoinRequest
-	2, // 2: btc.BitcoinService.GetBitCoinData:output_type -> btc.BitcoinResponse
-	2, // [2:3] is the sub-list for method output_type
-	1, // [1:2] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	1, // 0: btc.ExternalCryptoResponse.BTC:type_name -> btc.CryptoPrice
+	1, // 1: btc.ExternalCryptoResponse.ETH:type_name -> btc.CryptoPrice
+	1, // 2: btc.ExternalCryptoResponse.DOGE:type_name -> btc.CryptoPrice
+	3, // 3: btc.CryptoResponse.data:type_name -> btc.CryptoDatum
+	6, // 4: btc.MonthlyDatum.Data:type_name -> btc.CurrencyMonthlyDatum
+	7, // 5: btc.MonthlyDataResponse.Data:type_name -> btc.MonthlyDatum
+	0, // 6: btc.CryptoService.GetCryptoData:input_type -> btc.CryptoRequest
+	5, // 7: btc.CryptoService.GetMonthlyData:input_type -> btc.MonthlyDataRequest
+	4, // 8: btc.CryptoService.GetCryptoData:output_type -> btc.CryptoResponse
+	8, // 9: btc.CryptoService.GetMonthlyData:output_type -> btc.MonthlyDataResponse
+	8, // [8:10] is the sub-list for method output_type
+	6, // [6:8] is the sub-list for method input_type
+	6, // [6:6] is the sub-list for extension type_name
+	6, // [6:6] is the sub-list for extension extendee
+	0, // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_btc_proto_init() }
@@ -223,7 +690,7 @@ func file_btc_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_btc_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*BitcoinDatum); i {
+			switch v := v.(*CryptoRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -235,7 +702,7 @@ func file_btc_proto_init() {
 			}
 		}
 		file_btc_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*BitcoinRequest); i {
+			switch v := v.(*CryptoPrice); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -247,7 +714,79 @@ func file_btc_proto_init() {
 			}
 		}
 		file_btc_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*BitcoinResponse); i {
+			switch v := v.(*ExternalCryptoResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_btc_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CryptoDatum); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_btc_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CryptoResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_btc_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MonthlyDataRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_btc_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CurrencyMonthlyDatum); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_btc_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MonthlyDatum); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_btc_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MonthlyDataResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -265,7 +804,7 @@ func file_btc_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_btc_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

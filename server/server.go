@@ -2,44 +2,35 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"os"
-	"sort"
-	"time"
 
 	"github.com/go-redis/redis/v8"
 	pb "github.com/manedurphy/grpc-web/pb"
-	store "github.com/manedurphy/grpc-web/server/redis"
+	"github.com/manedurphy/grpc-web/server/handlers"
+	store "github.com/manedurphy/grpc-web/server/store"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/status"
 )
 
 var (
-	rdb *redis.Client = redis.NewClient(&redis.Options{
-		Addr:     os.Getenv("REDIS_URL"),
-		Password: store.GetPassword(),
-		DB:       0,
-	})
 	certfile = "tls/server.crt"
 	keyfile  = "tls/server.key"
+
+	secure = flag.Bool("secure", true, "set to true to use TLS connection")
 )
 
-type server struct {
-	pb.UnimplementedBitcoinServiceServer
-}
-
-type externalData struct {
-	Bpi map[string]float64
+type cryptoServer struct {
+	pb.UnimplementedCryptoServiceServer
 }
 
 func main() {
+	flag.Parse()
 	lis, err := net.Listen("tcp", ":8080")
 
 	if err != nil {
@@ -54,76 +45,131 @@ func main() {
 	}
 
 	var s *grpc.Server
-	if true {
+	if !*secure {
+		fmt.Println("Insecure connection established with gateway")
 		s = grpc.NewServer()
 	} else {
+		fmt.Println("TLS connection established with gateway")
 		s = grpc.NewServer(grpc.Creds(creds))
 	}
 
-	pb.RegisterBitcoinServiceServer(s, &server{})
+	pb.RegisterCryptoServiceServer(s, &cryptoServer{})
 
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("could not start server: %v\n", err)
 	}
 }
 
-func (*server) GetBitCoinData(ctx context.Context, req *pb.BitcoinRequest) (*pb.BitcoinResponse, error) {
-	redisData, err := rdb.Get(ctx, "data").Result()
+func (*cryptoServer) GetCryptoData(ctx context.Context, req *pb.CryptoRequest) (*pb.CryptoResponse, error) {
+	redisData, err := store.CheckStore(ctx, "crypto")
 
 	if err != redis.Nil {
-		redisResp, err := store.HandleRedisData([]byte(redisData))
+		redisResp, err := store.GetCryptoData([]byte(redisData))
 
 		if err == nil {
 			return redisResp, nil
 		}
 	}
 
-	resp, err := http.Get("https://api.coindesk.com/v1/bpi/historical/close.json")
-
+	url := os.Getenv("CRYPTO_THREE_URL")
+	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return nil, status.Errorf(codes.NotFound, "could not get data from external api: %v", err)
+		return nil, fmt.Errorf("could not gather data from crypto compare: %v", err)
+	}
+
+	request.Header.Add("Authorization", "Bearer "+os.Getenv("CRYPTO_API_KEY"))
+
+	client := &http.Client{}
+	resp, err := client.Do(request)
+	if err != nil {
+		return nil, fmt.Errorf("could not make request to crypto compare: %v", err)
 	}
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
-		return nil, fmt.Errorf("error reading external data: %v", err)
+		return nil, fmt.Errorf("could not read response body: %v", err)
 	}
 
-	btcResp, err := handleExternalData(body)
+	cryptoResp, err := handlers.HandleCryptoData(body)
 
 	if err != nil {
 		return nil, fmt.Errorf("error handling external data: %v", err)
 	}
 
-	cacheData, _ := json.Marshal(btcResp)
-	err = rdb.Set(ctx, "data", cacheData, 5*time.Minute).Err()
+	err = store.SetStoreData(ctx, "crypto", cryptoResp)
 
 	if err != nil {
 		fmt.Printf("could not set data in redis store: %v\n", err)
 	}
 
-	return &pb.BitcoinResponse{Data: btcResp}, nil
+	return cryptoResp, nil
 }
 
-func handleExternalData(body []byte) ([]*pb.BitcoinDatum, error) {
-	var data externalData
-	err := json.Unmarshal(body, &data)
+func (*cryptoServer) GetMonthlyData(ctx context.Context, req *pb.MonthlyDataRequest) (*pb.MonthlyDataResponse, error) {
+	var url string
 
-	btcResp := []*pb.BitcoinDatum{}
-
-	for k, v := range data.Bpi {
-		btcResp = append(btcResp, &pb.BitcoinDatum{Date: k, Value: v})
+	switch {
+	case req.GetCurrency() == "btc":
+		url = os.Getenv("CRYPTO_BTC_MONTHLY")
+	case req.GetCurrency() == "eth":
+		url = os.Getenv("CRYPTO_ETH_MONTHLY")
+	case req.GetCurrency() == "doge":
+		url = os.Getenv("CRYPTO_DOGE_MONTHLY")
+	default:
+		return nil, fmt.Errorf("currency not available")
 	}
 
-	sort.Slice(btcResp, func(i int, j int) bool {
-		return btcResp[i].Date < btcResp[j].Date
-	})
+	redisData, err := store.CheckStore(ctx, req.GetCurrency()+"-monthly")
+
+	if err != redis.Nil {
+		redisResp, err := store.GetMonthlyData([]byte(redisData))
+
+		if err == nil {
+			return redisResp, nil
+		}
+	}
+
+	if err != redis.Nil {
+		redisResp, err := store.GetMonthlyData([]byte(redisData))
+
+		if err == nil {
+			return redisResp, nil
+		}
+	}
+
+	request, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("could not gather data from crypto compare: %v", err)
+	}
+
+	request.Header.Add("Authorization", "Bearer "+os.Getenv("CRYPTO_API_KEY"))
+
+	client := &http.Client{}
+	resp, err := client.Do(request)
+	if err != nil {
+		return nil, fmt.Errorf("could not make request to crypto compare: %v", err)
+	}
+
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
-		log.Fatalf("could unmarshal external data: %v\n", err)
+		return nil, fmt.Errorf("could not read response body: %v", err)
 	}
 
-	return btcResp, nil
+	monthlyResp, err := handlers.HandleMonthlyData(body)
+
+	if err != nil {
+		return nil, fmt.Errorf("error handling external data: %v", err)
+	}
+
+	err = store.SetStoreData(ctx, req.GetCurrency()+"-monthly", monthlyResp)
+
+	if err != nil {
+		fmt.Printf("could not set data in redis store: %v\n", err)
+	}
+
+	return monthlyResp, nil
 }
