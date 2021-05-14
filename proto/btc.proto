@@ -8,15 +8,25 @@ import "google/api/annotations.proto";
 message CryptoRequest {
 }
 
-message CryptoDatum {
+message CryptoPrice {
 	double USD = 1;
 	double EUR = 2;
 }
 
+message ExternalCryptoResponse {
+	CryptoPrice BTC = 1;
+	CryptoPrice ETH = 2;
+	CryptoPrice DOGE = 3;
+}
+
+message CryptoDatum {
+	string name = 1;
+	double USD = 2;
+	double EUR = 3;
+}
+
 message CryptoResponse {
-	CryptoDatum BTC = 1;
-	CryptoDatum ETH = 2;
-	CryptoDatum DOGE = 3;
+	repeated CryptoDatum data = 1;
 }
 
 message MonthlyDataRequest {

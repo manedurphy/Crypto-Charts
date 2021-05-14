@@ -13,7 +13,7 @@ import (
 	"github.com/go-redis/redis/v8"
 	pb "github.com/manedurphy/grpc-web/pb"
 	"github.com/manedurphy/grpc-web/server/handlers"
-	store "github.com/manedurphy/grpc-web/server/redis"
+	store "github.com/manedurphy/grpc-web/server/store"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 )
@@ -30,6 +30,7 @@ type cryptoServer struct {
 }
 
 func main() {
+	flag.Parse()
 	lis, err := net.Listen("tcp", ":8080")
 
 	if err != nil {

@@ -22,6 +22,7 @@ services:
     - "8081:8081"
 
   btc-server:
+    restart: always
     build:
       context: ./server
       dockerfile: Dockerfile
@@ -33,7 +34,7 @@ services:
     - CRYPTO_ETH_MONTHLY=https://min-api.cryptocompare.com/data/v2/histoday?fsym=ETH&tsym=USD&limit=31
     - CRYPTO_DOGE_MONTHLY=https://min-api.cryptocompare.com/data/v2/histoday?fsym=DOGE&tsym=USD&limit=31
     volumes:
-    - ./server/redis-creds:/mnt/secrets-store/redis
+    - ./server/redis:/mnt/secrets-store/redis
 
   redis:
     build:

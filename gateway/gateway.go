@@ -21,6 +21,7 @@ var (
 )
 
 func main() {
+	flag.Parse()
 	if err := run(); err != nil {
 		log.Fatalf("could not start gateway: %v", err)
 	}
