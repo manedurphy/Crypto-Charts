@@ -17,7 +17,7 @@ cli:
 	docker run --rm -it -v $(shell pwd):/work -w /work --entrypoint /bin/bash linode
 
 weave: 
-	kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+	kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(shell kubectl version | base64 | tr -d '\n')"
 
 ingress-controller:
 	kubectl create namespace ingress-nginx
@@ -80,6 +80,7 @@ deploy:
 	kubectl create namespace crypto-charts
 	kubectl create --namespace=crypto-charts secret generic crypto-token --from-literal CRYPTO_API_KEY=$$CRYPTO_API_KEY
 	kubectl --namespace=crypto-charts apply -f k8s/spc.yaml
+	kubectl apply -f k8s/metrics-server.yaml
 	kubectl --namespace=crypto-charts create secret generic redis-credentials --from-literal redis-password=password
 	kubectl --namespace=crypto-charts apply -f k8s/configmaps.yaml
 	kubectl --namespace=crypto-charts apply -f k8s/services.yaml
@@ -87,7 +88,6 @@ deploy:
 	kubectl --namespace=crypto-charts apply -f k8s/ingress.yaml
 	kubectl --namespace=crypto-charts apply -f k8s/hpas.yaml
 	kubectl --namespace=crypto-charts apply -f k8s/statefulsets/redis-statefulset.yaml
-	# sleep 5s
 	kubectl wait --namespace=crypto-charts --for=condition=Ready --timeout=5m pod -l statefulset.kubernetes.io/pod-name=redis-0
 	kubectl wait --namespace=crypto-charts --for=condition=Ready --timeout=5m pod -l statefulset.kubernetes.io/pod-name=redis-1
 	kubectl wait --namespace=crypto-charts --for=condition=Ready --timeout=5m pod -l statefulset.kubernetes.io/pod-name=redis-2
@@ -95,14 +95,6 @@ deploy:
 	# kubectl --namespace=crypto-charts apply -f k8s/networkpolicies.yaml
 
 destroy:
-	# kubectl --namespace=crypto-charts delete -f k8s/spc.yaml
-	# kubectl --namespace=crypto-charts delete -f k8s/configmaps.yaml
-	# kubectl --namespace=crypto-charts delete -f k8s/services.yaml
-	# kubectl --namespace=crypto-charts delete -f k8s/deployments.yaml
-	# kubectl --namespace=crypto-charts delete -f k8s/ingress.yaml
-	# kubectl --namespace=crypto-charts delete -f k8s/hpas.yaml
-	# kubectl --namespace=crypto-charts delete -f k8s/networkpolicies.yaml
-	# kubectl --namespace=crypto-charts delete -f k8s/statefulsets.yaml
 	kubectl delete namespace crypto-charts --force --grace-period=0
 
 forward:
@@ -110,21 +102,10 @@ forward:
 	kubectl port-forward service/ingress-nginx-controller 3000:80
 
 metrics:
-	kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+	kubectl apply -f k8s/metrics-server.yaml
 
 del-metrics:
-	kubectl delete -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
-
-tls-ca:
-	openssl req -x509 -newkey rsa:4096 -days 1825 -subj "/CN=${SERVER_CN}" -keyout certs/cakey.pem -out certs/cacert.pem
-	openssl x509 -in certs/cacert.pem -noout -text
-
-tls-server: 
-	openssl req -newkey rsa:4096 -keyout certs/serverkey.pem -out certs/servercsr.pem -subj "/CN=${SERVER_CN}"
-	openssl x509 -req -in certs/servercsr.pem -CA certs/cacert.pem -CAkey certs/cakey.pem -CAcreateserial -out certs/servercert.pem -days 365
-	openssl x509 -in certs/servercert.pem -noout -text
-	mv certs/servercert.pem server/tls
-	mv certs/serverkey.pem server/tls
+	kubectl delete -f k8s/metrics-server.yaml
 
 tls:
 	cd certs && ./gen.sh
@@ -176,4 +157,7 @@ ss-destroy:
 	# helm uninstall --namespace=vault csi
 	kubectl delete namespace vault --force --grace-period=0
 
-crypto-charts: cluster secrets-store ingress-controller load deploy
+crypto-charts: tls cluster secrets-store ingress-controller load deploy forward
+
+kill-all: 
+	kind delete cluster
