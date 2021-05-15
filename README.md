@@ -25,7 +25,7 @@ The gRPC gateway receives requests from the Ingress Controller, and then to the 
 The server makes the request to the external API, shapes the data, and stores it in a Redis StatefulSet
 
 ## Redis (StatefulSet)
-The Redis StatefulSet is configured with a master-slave system, where slave pods synchronize their data with the master pod. Another StatefulSet, the Sentinal, is also there to ensure that a new master pod is elected when the current one fails for whatever reason. These steps were to ensure a highly available Redis cluster.
+The Redis StatefulSet is configured with a master-slave system, where slave pods synchronize their data with the master pod. Another StatefulSet, the Sentinel, is also there to ensure that a new master pod is elected when the current one fails for whatever reason. These steps were to ensure a highly available Redis cluster.
 
 ## CSI-Secrets-Store (Helm Chart)
 The [kubernetes-sigs/secrets-store-csi-driver](https://github.com/kubernetes-sigs/secrets-store-csi-driver) allows the user to store sensitive information externally from the cluster (or within). For this project, I used a `Vault` instance with the [hashicorp/vault-csi-provider](https://github.com/hashicorp/vault-csi-provider) to act as the bridge between the `CSI-Driver` and the `Vault` instance. The password the the Redis cluster is received from the `Vault` and mounted the file system of the `Server` pods.
