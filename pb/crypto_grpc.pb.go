@@ -133,5 +133,5 @@ var CryptoService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "btc.proto",
+	Metadata: "crypto.proto",
 }

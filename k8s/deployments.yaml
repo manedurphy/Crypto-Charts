@@ -139,11 +139,11 @@ spec:
           periodSeconds: 3
           failureThreshold: 10
         env:
-        - name: BTC_SERVER
+        - name: SERVER_URL
           valueFrom:
             configMapKeyRef:
               name: urls
-              key: BTC_SERVER
+              key: SERVER_URL
 # ---
 # apiVersion: apps/v1
 # kind: Deployment

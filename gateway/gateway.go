@@ -40,10 +40,10 @@ func run() error {
 	var err error
 	if !*secure {
 		fmt.Println("Insecure connection established with server")
-		conn, err = grpc.DialContext(ctx, os.Getenv("BTC_SERVER"), grpc.WithInsecure())
+		conn, err = grpc.DialContext(ctx, os.Getenv("SERVER_URL"), grpc.WithInsecure())
 	} else {
 		fmt.Println("TLS connection established with server")
-		conn, err = grpc.DialContext(ctx, os.Getenv("BTC_SERVER"), grpc.WithTransportCredentials(creds))
+		conn, err = grpc.DialContext(ctx, os.Getenv("SERVER_URL"), grpc.WithTransportCredentials(creds))
 	}
 
 	if err != nil {

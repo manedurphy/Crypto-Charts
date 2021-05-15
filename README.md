@@ -12,7 +12,7 @@ The client, a ReactJS frontend, makes a request for the data it needs to display
 # Kubernetes
 My primary focus throughout the project was to experiment with various system architectures using Kubernetes. These are the working parts I have included in this application:
 
-## Ingress Controller (Helm chart)
+## Ingress Controller (Helm Chart)
 When the browser makes the request for data, its request goes through an Nginx Ingress Controller that has defined the routes. A request to the root`"/"` path points to the Pod that serves the static HTML, CSS, and JS files. Once the JS has loaded, it makes a request to `"/api"`, where the Ingress Controller forwards that request to the gRPC gateway.
 
 ## Static Files (Deployment)
@@ -27,7 +27,7 @@ The server makes the request to the external API, shapes the data, and stores it
 ## Redis (StatefulSet)
 The Redis StatefulSet is configures with a master-slave system, where slave pods synchronize their data with the master pod. Another StatefulSet, the Sentinal, is also there to ensure that a new master pod is elected when the current one fails for whatever reason. These steps were to ensure a highly available Redis cluster.
 
-## CSI-Secrets-Store
+## CSI-Secrets-Store (Helm Chart)
 The [kubernetes-sigs/secrets-store-csi-driver](https://github.com/kubernetes-sigs/secrets-store-csi-driver) allows the user to store sensitive information externally from the cluster (or within). For this project, I used a `Vault` instance with the [hashicorp/vault-csi-provider](https://github.com/hashicorp/vault-csi-provider) to act as the bridge between the `CSI-Driver` and the `Vault` instance. The password the the Redis cluster is received from the `Vault` and mounted the file system of the `Server` pods.
 
 # Future Features
