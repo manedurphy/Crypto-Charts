@@ -7,7 +7,9 @@ grpc:
 build:
 	go build -o gateway/_output/gateway gateway/gateway.go
 	go build -o server/_output/server server/server.go
-	cd js && REACT_APP_DOCKER_ENV=true yarn run build
+	
+react-build:
+	cd js && yarn run build
 
 cluster:
 	kind create cluster --config kind.yaml
@@ -25,10 +27,9 @@ ingress-controller:
 	kubectl wait --namespace=ingress-nginx --for=condition=Ready --timeout=5m pod -l app.kubernetes.io/name=ingress-nginx
 
 ingress-destroy:
-	helm uninstall --namespace=ingress-nginx ingress-nginx
-	kubectl delete namespace ingress-nginx
+	kubectl delete namespace ingress-nginx --force --grace-period=0
 
-docker-build:
+docker-build: build react-build
 	docker build -f gateway/Dockerfile.prod -t gateway gateway
 	docker build -f server/Dockerfile -t server server
 	docker build -f js/Dockerfile.prod -t js js
@@ -46,31 +47,25 @@ docker-push: docker-build docker-tag
 	docker push manedurphy/grpc-js
 	docker push manedurphy/grpc-redis
 
-compose-dev: build
+compose: build
 	docker-compose up --build
-
-compose-prod: build
-	docker-compose -f docker-compose.prod.yaml up --build
 
 teardown:
 	docker-compose down && docker image prune -a
 
 gateway-image:
-	go build -o gateway/_output/gateway gateway/gateway.go
 	docker build -t k8s/gateway:latest -f gateway/Dockerfile.prod gateway/
 
 server-image:
-	go build -o server/_output/server server/server.go
 	docker build -t k8s/server:latest -f server/Dockerfile server/
 
 js-image:
-	cd js && yarn run build
 	docker build -t k8s/js:latest -f js/Dockerfile.prod js/
 
 redis-image:
 	docker build -t k8s/redis:latest -f redis/Dockerfile redis/
 
-load: gateway-image server-image js-image redis-image
+load: build react-build gateway-image server-image js-image redis-image
 	kind load docker-image k8s/gateway:latest
 	kind load docker-image k8s/server:latest
 	kind load docker-image k8s/js:latest
@@ -153,11 +148,12 @@ csi-driver:
 secrets-store: vault csi-driver
 
 ss-destroy:
-	# helm uninstall --namespace=vault vault
-	# helm uninstall --namespace=vault csi
 	kubectl delete namespace vault --force --grace-period=0
 
 crypto-charts: tls cluster secrets-store ingress-controller load deploy forward
 
-kill-all: 
+kill-all: destroy ss-destroy ingress-destroy
+	kubectl config set-context --current --namespace=default
+
+kill-cluster:
 	kind delete cluster

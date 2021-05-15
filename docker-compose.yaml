@@ -9,8 +9,6 @@ services:
     - "3000:3000"
     volumes:
     - ./js/src:/app/src
-    environment:
-    - REACT_APP_DOCKER_ENV=true
 
   gateway:
     build:

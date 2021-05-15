@@ -10,13 +10,14 @@ export function handleDateConversion(data) {
 export function getUrl(current) {
     let url;
     if (current === 'bar') {
-        url = process.env.REACT_APP_DOCKER_ENV ? 'http://localhost:8081/api/crypto' : '/api/crypto';
+        url = process.env.NODE_ENV === 'development' ? 'http://localhost:8081/api/crypto' : '/api/crypto';
     }
 
     if (current !== 'bar') {
-        url = process.env.REACT_APP_DOCKER_ENV
-            ? `http://localhost:8081/api/crypto/monthly/${current}`
-            : `/api/crypto/monthly/${current}`;
+        url =
+            process.env.NODE_ENV === 'development'
+                ? `http://localhost:8081/api/crypto/monthly/${current}`
+                : `/api/crypto/monthly/${current}`;
     }
     return url;
 }
