@@ -45,4 +45,4 @@ To run in K8s using Kind
 ```bash
 make crypto-charts
 ```
-This creates the cluster and builds everything from scratch. Showcase [here](https://www.youtube.com/watch?v=IMOotCDbdQM).
+This creates the cluster and builds everything from scratch. Showcase [here](https://www.youtube.com/watch?v=EyPOwkIa48s).
