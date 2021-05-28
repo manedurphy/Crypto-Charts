@@ -15,9 +15,9 @@ spec:
       serviceAccountName: redis-sa
       containers:
       - name: server-container
-        # image: manedurphy/grpc-server
-        image: k8s/server:latest
-        imagePullPolicy: Never
+        image: manedurphy/grpc-server
+        # image: k8s/server:latest
+        # imagePullPolicy: Never
         resources:
           requests:
             memory: "10Mi"
@@ -87,9 +87,9 @@ spec:
     spec:
       containers:
       - name: js-container
-        # image: manedurphy/grpc-js
-        image: k8s/js:latest
-        imagePullPolicy: Never
+        image: manedurphy/grpc-js
+        # image: k8s/js:latest
+        # imagePullPolicy: Never
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -108,9 +108,9 @@ spec:
     spec:
       containers:
       - name: gateway-container
-        # image: manedurphy/grpc-gateway
-        image: k8s/gateway:latest
-        imagePullPolicy: Never
+        image: manedurphy/grpc-gateway
+        # image: k8s/gateway:latest
+        # imagePullPolicy: Never
         resources:
           requests:
             memory: "10Mi"
