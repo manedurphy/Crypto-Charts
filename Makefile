@@ -13,6 +13,9 @@ react-build:
 
 cluster:
 	kind create cluster --config kind.yaml
+	kubectl wait --for=condition=Ready --timeout=5m node -l kubernetes.io/hostname=kind-control-plane
+	kubectl wait --for=condition=Ready --timeout=5m node -l kubernetes.io/hostname=kind-worker
+	kubectl wait --for=condition=Ready --timeout=5m node -l kubernetes.io/hostname=kind-worker2
 
 cli:
 	cd kubeconfig && docker build -t linode .
@@ -108,7 +111,7 @@ tls:
 	cp certs/server.crt server/tls
 	cp certs/ca.crt gateway/tls
 
-vault-deploy:
+vault-local:
 	kubectl create namespace vault
 	helm install vault --namespace=vault hashicorp/vault \
 		--set "server.dev.enabled=true" \
@@ -117,7 +120,20 @@ vault-deploy:
 	kubectl wait --namespace=vault --for=condition=Ready --timeout=5m pod/vault-0
 	kubectl wait --namespace=vault --for=condition=Ready --timeout=5m pod -l app.kubernetes.io/name=vault-csi-provider
 
-vault-secret:
+vault-cloud:
+	kubectl create namespace vault
+	kubectl apply --namespace=vault -f k8s/vaultconfigmap.yaml
+	helm install --namespace=vault vault hashicorp/vault --values vault/vault.values.yaml
+	sleep 20s
+	kubectl exec -it --namespace=vault vault-0 -- /bin/sh -c /mnt/bootstrap/bootstrap.sh
+	kubectl wait --namespace=vault --for=condition=Ready --timeout=5m pod/vault-0
+
+vault-secret-dev:
+	kubectl exec --namespace=vault vault-0 -- vault kv put secret/redis redis-password="password"
+	kubectl exec --namespace=vault vault-0 -- vault kv get secret/redis
+
+vault-secret-prod:
+	kubectl exec --namespace=vault vault-0 -- vault secrets enable -path=secret kv-v2
 	kubectl exec --namespace=vault vault-0 -- vault kv put secret/redis redis-password="password"
 	kubectl exec --namespace=vault vault-0 -- vault kv get secret/redis
 
@@ -139,18 +155,24 @@ vault-role:
 		policies=redis-policy \
 		ttl=20m	
 
-vault: vault-deploy vault-secret vault-auth vault-policy vault-role
+vault-dev: vault-local vault-secret-dev vault-auth vault-policy vault-role
+
+vault-prod: vault-cloud vault-secret-prod vault-auth vault-policy vault-role
 
 csi-driver:
 	helm install csi --namespace=vault secrets-store-csi-driver/secrets-store-csi-driver
 	kubectl wait --namespace=vault --for=condition=Ready --timeout=5m pod -l app.kubernetes.io/name=secrets-store-csi-driver
 
-secrets-store: vault csi-driver
+secrets-store-dev: vault-dev csi-driver
+
+secrets-store-prod: vault-prod csi-driver
 
 ss-destroy:
 	kubectl delete namespace vault --force --grace-period=0
 
-crypto-charts: tls cluster secrets-store ingress-controller load deploy forward
+crypto-charts-dev: tls cluster secrets-store-dev ingress-controller load deploy forward
+
+crypto-charts-prod: tls cluster secrets-store-prod ingress-controller load deploy forward
 
 kill-all: destroy ss-destroy ingress-destroy
 	kubectl config set-context --current --namespace=default

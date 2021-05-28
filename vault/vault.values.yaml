@@ -1,0 +1,35 @@
+global:
+  enabled: true
+
+injector:
+  enabled: false
+
+server:
+  image:
+    repository: vault
+  volumes:
+  - name: vault-bootstrap
+    configMap:
+      name: vault-bootstrap
+      defaultMode: 0777
+  volumeMounts:
+  - name: vault-bootstrap
+    mountPath: /mnt/bootstrap
+  ha:
+    enabled: true
+    replicas: 1
+    config: |
+      ui = true
+
+      listener "tcp" {
+        tls_disable = 1
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+      }
+
+      storage "file" {
+        path = "/tmp/vault-data"
+      }
+
+csi:
+  enabled: true
